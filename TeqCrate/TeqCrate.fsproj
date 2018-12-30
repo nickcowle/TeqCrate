@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <WarningLevel>5</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Unreachable.fs" />
+    <Compile Include="Teq.fs" />
+    <Compile Include="Reflection.fs" />
+    <Compile Include="HList.fs" />
+    <Compile Include="HUnion.fs" />
+    <Compile Include="TypePatterns.fs" />
+    <Compile Include="Type.fs" />
+    <Compile Include="TeqCrates.fs" />
+    <Compile Include="ConvCrates.fs" />
+    <Compile Include="Patterns.fs" />
+    <Compile Include="HListFolder.fs" />
+    <Compile Include="Tuple.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="TypeEquality" Version="0.0.1" />
+    <PackageReference Update="FSharp.Core" Version="4.5.4" />
+  </ItemGroup>
+
+</Project>

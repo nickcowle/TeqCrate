@@ -1,0 +1,3 @@
+﻿namespace TeqCrate
+
+exception Unreachable
