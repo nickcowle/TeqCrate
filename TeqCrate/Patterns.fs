@@ -9,7 +9,7 @@ module Patterns =
     let typ<'a> : 'a Typ = Typ ()
 
     let (|Teq|_|) (_ : 'b Typ) (_ : 'a Typ) : Teq<'a, 'b> option =
-        Teq.tryMake
+        Teq.tryRefl<'a, 'b>
 
     let (|Array|_|) (_ : 'a Typ) : 'a ArrayTeqCrate option =
         ArrayTeqCrate.tryMake ()
