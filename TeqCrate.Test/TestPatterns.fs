@@ -164,7 +164,7 @@ module TestPatterns =
     type TestUnion =
     | Foo
     | Bar of int * string * bool
-    | Baz of string * float
+    | Baz of string
 
     [<Fact>]
     let ``Union active pattern recognises a union`` () =
@@ -181,7 +181,7 @@ module TestPatterns =
                             let expectedNames = [ "Foo" ; "Bar" ; "Baz" ]
                             Assert.Equal<string list>(expectedNames, names)
 
-                            let expectedUnionType = typ<(unit HList -> (int -> string -> bool -> unit) HList -> (string -> float -> unit) HList -> unit) HUnion>
+                            let expectedUnionType = typ<(unit -> (int * string * bool) -> string -> unit) HUnion>
                             match typ<'a HUnion> with
                             | Teq expectedUnionType teq ->
                                 let converted = testValue |> conv.To |> Teq.castTo teq

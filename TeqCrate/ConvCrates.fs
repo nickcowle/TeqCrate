@@ -19,18 +19,18 @@ module private Conv =
         { To = toF ; From = fromF }
 
 
-type private ObjListConvCrate = abstract member Apply : ObjListConvCrateEvaluator<'ret> -> 'ret
-and private ObjListConvCrateEvaluator<'ret> = abstract member Eval : Conv<obj list, 'a HList> -> 'ret
+type private ObjListHListConvCrate = abstract member Apply : ObjListHListConvCrateEvaluator<'ret> -> 'ret
+and private ObjListHListConvCrateEvaluator<'ret> = abstract member Eval : Conv<obj list, 'a HList> -> 'ret
 
 [<RequireQualifiedAccess>]
-module private ObjListConvCrate =
+module private ObjListHListConvCrate =
 
-    let make (conv : Conv<obj list, 'a HList>) : ObjListConvCrate =
-        { new ObjListConvCrate with
+    let make (conv : Conv<obj list, 'a HList>) : ObjListHListConvCrate =
+        { new ObjListHListConvCrate with
             member __.Apply e = e.Eval conv
         }
 
-    let rec makeUntyped (ts : Type list) : ObjListConvCrate =
+    let rec makeUntyped (ts : Type list) : ObjListHListConvCrate =
         match ts with
         | [] ->
             Conv.make (fun _ -> HList.empty) (fun _ -> []) |> make
@@ -38,9 +38,9 @@ module private ObjListConvCrate =
             Reflection.invokeStaticMethod <@ makeUntypedInner @> [| t |] [| ts |]
             |> unbox
 
-    and makeUntypedInner<'t> (ts : Type list) : ObjListConvCrate =
+    and private makeUntypedInner<'t> (ts : Type list) : ObjListHListConvCrate =
         (makeUntyped ts).Apply
-            { new ObjListConvCrateEvaluator<_> with
+            { new ObjListHListConvCrateEvaluator<_> with
                 member __.Eval conv =
                     let toF os =
                         match os with
@@ -54,8 +54,48 @@ module private ObjListConvCrate =
             }
 
 
-type 'a TupleConvCrate = abstract member Apply : TupleConvCrateEvaluator<'a, 'ret> -> 'ret
-and TupleConvCrateEvaluator<'a, 'ret> = abstract member Eval : Conv<'a, 'b HList> -> 'ret
+type private ObjListTupleConvCrate = abstract member Apply : ObjListTupleConvCrateEvaluator<'ret> -> 'ret
+and private ObjListTupleConvCrateEvaluator<'ret> = abstract member Eval : Conv<obj list, 'tuple> -> 'ret
+
+[<RequireQualifiedAccess>]
+module private ObjListTupleConvCrate =
+
+    let make (conv : Conv<obj list, 'tuple>) : ObjListTupleConvCrate =
+        { new ObjListTupleConvCrate with
+            member __.Apply e = e.Eval conv
+        }
+
+    let rec makeUntyped (ts : Type list) : ObjListTupleConvCrate =
+
+        match ts with
+        | [] ->
+            let toF (os : obj list) : unit = ()
+            let fromF (t : unit) : obj list = []
+            Conv.make toF fromF |> make
+        | [ t ] ->
+            Reflection.invokeStaticMethod <@ makeUntypedInnerSingle @> ts [| |]
+            |> unbox
+        | _ ->
+            let tupleType = ts |> Array.ofList |> FSharpType.MakeTupleType
+            Reflection.invokeStaticMethod <@ makeUntypedInner @> [| tupleType |] [| |]
+            |> unbox
+
+    and makeUntypedInnerSingle<'a> () : ObjListTupleConvCrate =
+        let toF os = os |> List.exactlyOne |> unbox<'a>
+        let fromF a = [ box a ]
+        Conv.make toF fromF |> make
+
+    and makeUntypedInner<'tuple> () : ObjListTupleConvCrate =
+        let tupleType = typeof<'tuple>
+        let reader = FSharpValue.PreComputeTupleReader tupleType
+        let constructor = FSharpValue.PreComputeTupleConstructor tupleType
+        let toF = Array.ofList >> constructor >> unbox<'tuple>
+        let fromF = box >> reader >> List.ofArray
+        Conv.make toF fromF |> make
+
+
+type 'tuple TupleConvCrate = abstract member Apply : TupleConvCrateEvaluator<'tuple, 'ret> -> 'ret
+and TupleConvCrateEvaluator<'tuple, 'ret> = abstract member Eval : Conv<'tuple, 'b HList> -> 'ret
 
 [<RequireQualifiedAccess>]
 module TupleConvCrate =
@@ -71,9 +111,9 @@ module TupleConvCrate =
 
         match t with
         | Tuple ts ->
-            let crate = ts |> ObjListConvCrate.makeUntyped
+            let crate = ts |> ObjListHListConvCrate.makeUntyped
             crate.Apply
-                { new ObjListConvCrateEvaluator<_> with
+                { new ObjListHListConvCrateEvaluator<_> with
                     member __.Eval conv =
 
                         let reader = FSharpValue.PreComputeTupleReader t
@@ -107,9 +147,9 @@ module RecordConvCrate =
 
         match t with
         | Record fs ->
-            let crate = fs |> List.map snd |> ObjListConvCrate.makeUntyped
+            let crate = fs |> List.map snd |> ObjListHListConvCrate.makeUntyped
             crate.Apply
-                { new ObjListConvCrateEvaluator<_> with
+                { new ObjListHListConvCrateEvaluator<_> with
                     member __.Eval conv =
 
                         let reader = FSharpValue.PreComputeRecordReader(t, true)
@@ -126,7 +166,6 @@ module RecordConvCrate =
         | _ ->
             None
 
-
 type private UnionCaseConvCrate = abstract member Apply : UnionCaseConvCrateEvaluator<'ret> -> 'ret
 and private UnionCaseConvCrateEvaluator<'ret> = abstract member Eval : Conv<UnionCaseInfo * obj list, 'a HUnion> -> 'a HUnionTail -> 'ret
 
@@ -140,25 +179,25 @@ module private UnionCaseConvCrate =
 
     let convCrateForCase (case : UnionCaseInfo) =
         let caseFields = case.GetFields () |> Seq.map (fun f -> f.PropertyType) |> List.ofSeq
-        ObjListConvCrate.makeUntyped caseFields
+        ObjListTupleConvCrate.makeUntyped caseFields
 
     let rec makeUntyped (cases : UnionCaseInfo list) : UnionCaseConvCrate =
         match cases with
         | [] -> raise Unreachable
         | [case] ->
             (convCrateForCase case).Apply
-                { new ObjListConvCrateEvaluator<_> with
+                { new ObjListTupleConvCrateEvaluator<_> with
                     member __.Eval conv =
                         let toF (_, os) = os |> conv.To |> HUnion.make HUnionTail.empty
                         let fromF union =
                             match HUnion.split union with
-                            | Choice1Of2 hList -> case, conv.From hList
+                            | Choice1Of2 tuple -> case, conv.From tuple
                             | Choice2Of2 _ -> raise Unreachable
                         make (Conv.make toF fromF) (HUnionTail.empty |> HUnionTail.extend)
                 }
         | case::cases ->
             (convCrateForCase case).Apply
-                { new ObjListConvCrateEvaluator<_> with
+                { new ObjListTupleConvCrateEvaluator<_> with
                     member __.Eval caseConv =
                         let crate = makeUntyped cases
                         crate.Apply
@@ -171,7 +210,7 @@ module private UnionCaseConvCrate =
                                             (c, os) |> unionConv.To |> HUnion.extend
                                     let fromF union =
                                         match HUnion.split union with
-                                        | Choice1Of2 hList -> case, caseConv.From hList
+                                        | Choice1Of2 tuple -> case, caseConv.From tuple
                                         | Choice2Of2 union -> unionConv.From union
                                     make (Conv.make toF fromF) (tail |> HUnionTail.extend)
                             }
