@@ -164,7 +164,8 @@ module TestPatterns =
     type TestUnion =
     | Foo
     | Bar of int * string * bool
-    | Baz of string
+    | Baz of string * float
+    | Quux of string
 
     [<Fact>]
     let ``Union active pattern recognises a union`` () =
@@ -178,10 +179,10 @@ module TestPatterns =
                     { new UnionConvCrateEvaluator<_,_> with
                         member __.Eval names (conv : Conv<TestUnion, 'a HUnion>) =
 
-                            let expectedNames = [ "Foo" ; "Bar" ; "Baz" ]
+                            let expectedNames = [ "Foo" ; "Bar" ; "Baz" ; "Quux" ]
                             Assert.Equal<string list>(expectedNames, names)
 
-                            let expectedUnionType = typ<(unit -> (int * string * bool) -> string -> unit) HUnion>
+                            let expectedUnionType = typ<(unit -> (int * string * bool) -> (string * float) -> string -> unit) HUnion>
                             match typ<'a HUnion> with
                             | Teq expectedUnionType teq ->
                                 let converted = testValue |> conv.To |> Teq.castTo teq
