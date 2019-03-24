@@ -4,48 +4,48 @@ open TypeEquality
 
 module Patterns =
 
-    type 'a Typ = Typ of unit
+    type 'a TType = TType of unit
 
-    let typ<'a> : 'a Typ = Typ ()
+    let tType<'a> : 'a TType = TType ()
 
-    let (|Teq|_|) (_ : 'b Typ) (_ : 'a Typ) : Teq<'a, 'b> option =
+    let (|Teq|_|) (_ : 'b TType) (_ : 'a TType) : Teq<'a, 'b> option =
         Teq.tryRefl<'a, 'b>
 
-    let (|Array|_|) (_ : 'a Typ) : 'a ArrayTeqCrate option =
+    let (|Array|_|) (_ : 'a TType) : 'a ArrayTeqCrate option =
         ArrayTeqCrate.tryMake ()
 
-    let (|List|_|) (_ : 'a Typ) : 'a ListTeqCrate option =
+    let (|List|_|) (_ : 'a TType) : 'a ListTeqCrate option =
         ListTeqCrate.tryMake ()
 
-    let (|Seq|_|) (_ : 'a Typ) : 'a SeqTeqCrate option =
+    let (|Seq|_|) (_ : 'a TType) : 'a SeqTeqCrate option =
         SeqTeqCrate.tryMake ()
 
-    let (|Set|_|) (_ : 'a Typ) : 'a SetTeqCrate option =
+    let (|Set|_|) (_ : 'a TType) : 'a SetTeqCrate option =
         SetTeqCrate.tryMake ()
 
-    let (|Map|_|) (_ : 'a Typ) : 'a MapTeqCrate option =
+    let (|Map|_|) (_ : 'a TType) : 'a MapTeqCrate option =
         MapTeqCrate.tryMake ()
 
-    let (|Dictionary|_|) (_ : 'a Typ) : 'a DictionaryTeqCrate option =
+    let (|Dictionary|_|) (_ : 'a TType) : 'a DictionaryTeqCrate option =
         DictionaryTeqCrate.tryMake ()
 
-    let (|ResizeArray|_|) (_ : 'a Typ) : 'a ResizeArrayTeqCrate option =
+    let (|ResizeArray|_|) (_ : 'a TType) : 'a ResizeArrayTeqCrate option =
         ResizeArrayTeqCrate.tryMake ()
 
-    let (|Fun|_|) (_ : 'a Typ) : 'a FunTeqCrate option =
+    let (|Fun|_|) (_ : 'a TType) : 'a FunTeqCrate option =
         FunTeqCrate.tryMake ()
 
-    let (|Pair|_|) (_ : 'a Typ) : 'a PairTeqCrate option =
+    let (|Pair|_|) (_ : 'a TType) : 'a PairTeqCrate option =
         PairTeqCrate.tryMake ()
 
-    let (|Triple|_|) (_ : 'a Typ) : 'a TripleTeqCrate option =
+    let (|Triple|_|) (_ : 'a TType) : 'a TripleTeqCrate option =
         TripleTeqCrate.tryMake ()
 
-    let (|Tuple|_|) (_ : 'a Typ) : 'a TupleConvCrate option =
+    let (|Tuple|_|) (_ : 'a TType) : 'a TupleConvCrate option =
         TupleConvCrate.tryMake ()
 
-    let (|Record|_|) (_ : 'a Typ) : 'a RecordConvCrate option =
+    let (|Record|_|) (_ : 'a TType) : 'a RecordConvCrate option =
         RecordConvCrate.tryMake ()
 
-    let (|Union|_|) (_ : 'a Typ) : 'a UnionConvCrate option =
+    let (|Union|_|) (_ : 'a TType) : 'a UnionConvCrate option =
         UnionConvCrate.tryMake ()

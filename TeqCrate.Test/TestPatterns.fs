@@ -12,8 +12,8 @@ module TestPatterns =
     [<Fact>]
     let ``Teq active pattern distinguishes int from string`` () =
 
-        let t1 = typ<int>
-        let t2 = typ<string>
+        let t1 = tType<int>
+        let t2 = tType<string>
 
         match t1 with
         | Teq t2 teq ->
@@ -22,7 +22,7 @@ module TestPatterns =
             Assert.True true
 
     let tryGetArrayLength (arr : 'a) : int option =
-        match typ<'a> with
+        match tType<'a> with
         | Array c ->
             c.Apply
                 { new ArrayTeqCrateEvaluator<_,_> with
@@ -37,7 +37,7 @@ module TestPatterns =
         Assert.Equal (Some 2, tryGetArrayLength arr)
 
     let tryGetListLength (xs : 'a) : int option =
-        match typ<'a> with
+        match tType<'a> with
         | List c ->
             c.Apply
                 { new ListTeqCrateEvaluator<_,_> with
@@ -52,7 +52,7 @@ module TestPatterns =
         Assert.Equal (Some 10, tryGetListLength xs)
 
     let tryGetMapCount (map : 'a) : int option =
-        match typ<'a> with
+        match tType<'a> with
         | Map c ->
             c.Apply
                 { new MapTeqCrateEvaluator<_,_> with
@@ -76,7 +76,7 @@ module TestPatterns =
     [<Fact>]
     let ``Fun active pattern recognises a function`` () =
 
-        match typ<int -> string> with
+        match tType<int -> string> with
         | Fun c ->
             let dom, ran =
                 c.Apply
@@ -93,7 +93,7 @@ module TestPatterns =
     [<Fact>]
     let ``Pair active pattern recognises a pair`` () =
 
-        match typ<int * string> with
+        match tType<int * string> with
         | Pair c ->
             let t1, t2 =
                 c.Apply
@@ -110,7 +110,7 @@ module TestPatterns =
     [<Fact>]
     let ``Triple active pattern recognises a triple`` () =
 
-        match typ<int * string * bool> with
+        match tType<int * string * bool> with
         | Triple c ->
             let t1, t2, t3 =
                 c.Apply
@@ -133,7 +133,7 @@ module TestPatterns =
         }
 
     let tryGetStringKeyValues (record : 'a) : Map<string, string> option =
-        match typ<'a> with
+        match tType<'a> with
         | Record c ->
             c.Apply
                 { new RecordConvCrateEvaluator<_,_> with
@@ -174,7 +174,7 @@ module TestPatterns =
         let testValue = Bar (1234, "test", true)
 
         let result =
-            match typ<TestUnion> with
+            match tType<TestUnion> with
             | Union c ->
                 c.Apply
                     { new UnionConvCrateEvaluator<_,_> with
@@ -183,8 +183,8 @@ module TestPatterns =
                             let expectedNames = [ "Foo" ; "Bar" ; "Baz" ; "Quux" ]
                             Assert.Equal<string list>(expectedNames, names)
 
-                            let expectedUnionType = typ<(unit -> (int * string * bool) -> (string * float) -> string -> unit) HUnion>
-                            match typ<'a HUnion> with
+                            let expectedUnionType = tType<(unit -> (int * string * bool) -> (string * float) -> string -> unit) HUnion>
+                            match tType<'a HUnion> with
                             | Teq expectedUnionType teq ->
                                 let converted = testValue |> conv.To |> Teq.castTo teq
                                 match HUnion.split converted with

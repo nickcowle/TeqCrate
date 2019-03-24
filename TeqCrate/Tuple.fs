@@ -7,7 +7,7 @@ open TeqCrate.Patterns
 module Tuple =
 
     let tryFoldTuple (folder : 's HListFolder) (s : 's) (tuple : 't) : 's option =
-        match typ<'t> with
+        match tType<'t> with
         | Tuple c ->
             c.Apply
                 { new TupleConvCrateEvaluator<_,_> with
