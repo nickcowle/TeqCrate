@@ -1,5 +1,6 @@
 namespace TeqCrate.Test
 
+open HCollections
 open TeqCrate
 open TeqCrate.Patterns
 open TypeEquality

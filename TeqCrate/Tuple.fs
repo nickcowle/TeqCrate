@@ -1,5 +1,6 @@
 ﻿namespace TeqCrate
 
+open HCollections
 open TeqCrate.Patterns
 
 [<RequireQualifiedAccess>]

@@ -1,5 +1,6 @@
 ﻿namespace TeqCrate
 
+open HCollections
 open Microsoft.FSharp.Reflection
 open System
 open TeqCrate.TypePatterns
