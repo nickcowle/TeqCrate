@@ -1,3 +1,3 @@
 ﻿namespace TeqCrate
 
-exception Unreachable
+exception internal Unreachable
