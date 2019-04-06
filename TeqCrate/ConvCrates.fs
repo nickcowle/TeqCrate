@@ -4,8 +4,8 @@ open HCollections
 open Microsoft.FSharp.Reflection
 open TypePatterns
 
-type 'tuple TupleConvCrate = abstract member Apply : TupleConvCrateEvaluator<'tuple, 'ret> -> 'ret
-and TupleConvCrateEvaluator<'tuple, 'ret> = abstract member Eval : 'ts TypeList -> Conv<'tuple, 'ts HList> -> 'ret
+type TupleConvEvaluator<'tuple, 'ret> = abstract member Eval : 'ts TypeList -> Conv<'tuple, 'ts HList> -> 'ret
+type 'tuple TupleConvCrate = abstract member Apply : TupleConvEvaluator<'tuple, 'ret> -> 'ret
 
 module TupleConvCrate =
 
@@ -26,7 +26,7 @@ module TupleConvCrate =
     and makeUntypedInner<'t> ts =
         let crate = makeUntyped ts
         crate.Apply
-            { new TupleConvCrateEvaluator<_,_> with
+            { new TupleConvEvaluator<_,_> with
                 member __.Eval ts conv =
                     let toF os =
                         let t = os |> List.head |> unbox<'t>
@@ -50,7 +50,7 @@ module TupleConvCrate =
 
             let crate = makeUntyped ts
             crate.Apply
-                { new TupleConvCrateEvaluator<_,_> with
+                { new TupleConvEvaluator<_,_> with
                     member __.Eval ts conv = Conv.compose tupleConv conv |> make ts
                 }
             |> Some
@@ -58,8 +58,8 @@ module TupleConvCrate =
         | _ -> None
 
 
-type 'record RecordConvCrate = abstract member Apply : RecordConvCrateEvaluator<'record, 'ret> -> 'ret
-and RecordConvCrateEvaluator<'record, 'ret> = abstract member Eval : string list -> 'ts TypeList -> Conv<'record, 'ts HList> -> 'ret
+type RecordConvEvaluator<'record, 'ret> = abstract member Eval : string list -> 'ts TypeList -> Conv<'record, 'ts HList> -> 'ret
+type 'record RecordConvCrate = abstract member Apply : RecordConvEvaluator<'record, 'ret> -> 'ret
 
 module RecordConvCrate =
 
@@ -80,7 +80,7 @@ module RecordConvCrate =
     and makeUntypedInner<'t> names tl ts =
         let crate = makeUntyped names tl ts
         crate.Apply
-            { new RecordConvCrateEvaluator<_,_> with
+            { new RecordConvEvaluator<_,_> with
                 member __.Eval names tl conv =
                     let toF os =
                         let t = os |> List.head |> unbox<'t>
@@ -105,7 +105,7 @@ module RecordConvCrate =
             let names, ts = ts |> List.unzip
             let crate = makeUntyped names TypeList.empty ts
             crate.Apply
-                { new RecordConvCrateEvaluator<_,_> with
+                { new RecordConvEvaluator<_,_> with
                     member __.Eval names tl conv =
                         Conv.compose recordConv conv |> make names tl
                 }
@@ -114,8 +114,8 @@ module RecordConvCrate =
         | _ -> None
 
 
-type 'union UnionConvCrate = abstract member Apply : UnionConvCrateEvaluator<'union, 'ret> -> 'ret
-and UnionConvCrateEvaluator<'union, 'ret> = abstract member Eval : string list -> 'ts TypeList -> Conv<'union, 'ts HUnion> -> 'ret
+type UnionConvEvaluator<'union, 'ret> = abstract member Eval : string list -> 'ts TypeList -> Conv<'union, 'ts HUnion> -> 'ret
+type 'union UnionConvCrate = abstract member Apply : UnionConvEvaluator<'union, 'ret> -> 'ret
 
 module UnionConvCrate =
 
@@ -141,7 +141,7 @@ module UnionConvCrate =
         | _ ->
             let crate = makeUntyped names ts
             crate.Apply
-                { new UnionConvCrateEvaluator<_,_> with
+                { new UnionConvEvaluator<_,_> with
                     member __.Eval names ts conv =
                         let toF (i, o) =
                             if i = 0 then o |> unbox<'t> |> HUnion.make ts
@@ -199,7 +199,7 @@ module UnionConvCrate =
             let names = cases |> List.map (fun case -> case.Name)
             let crate = makeUntyped names ts
             crate.Apply
-                { new UnionConvCrateEvaluator<_,_> with
+                { new UnionConvEvaluator<_,_> with
                     member __.Eval names ts conv =
                         Conv.compose unionConv conv |> make names ts
                 }

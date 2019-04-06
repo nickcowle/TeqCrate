@@ -5,8 +5,8 @@ open TeqCrate.TypePatterns
 open TypeEquality
 
 
-type 'a ArrayTeqCrate = abstract member Apply : ArrayTeqCrateEvaluator<'a, 'ret> -> 'ret
-and ArrayTeqCrateEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, 'b array> -> 'ret
+type ArrayTeqEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, 'b array> -> 'ret
+type 'a ArrayTeqCrate = abstract member Apply : ArrayTeqEvaluator<'a, 'ret> -> 'ret
 
 [<RequireQualifiedAccess>]
 module ArrayTeqCrate =
@@ -25,8 +25,8 @@ module ArrayTeqCrate =
             None
 
 
-type 'a ListTeqCrate = abstract member Apply : ListTeqCrateEvaluator<'a, 'ret> -> 'ret
-and ListTeqCrateEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, 'b list> -> 'ret
+type ListTeqEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, 'b list> -> 'ret
+type 'a ListTeqCrate = abstract member Apply : ListTeqEvaluator<'a, 'ret> -> 'ret
 
 [<RequireQualifiedAccess>]
 module ListTeqCrate =
@@ -44,8 +44,8 @@ module ListTeqCrate =
         | _ -> None
 
 
-type 'a SeqTeqCrate = abstract member Apply : SeqTeqCrateEvaluator<'a, 'ret> -> 'ret
-and SeqTeqCrateEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, 'b seq> -> 'ret
+type SeqTeqEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, 'b seq> -> 'ret
+type 'a SeqTeqCrate = abstract member Apply : SeqTeqEvaluator<'a, 'ret> -> 'ret
 
 [<RequireQualifiedAccess>]
 module SeqTeqCrate =
@@ -63,8 +63,8 @@ module SeqTeqCrate =
         | _ -> None
 
 
-type 'a SetTeqCrate = abstract member Apply : SetTeqCrateEvaluator<'a, 'ret> -> 'ret
-and SetTeqCrateEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, 'b Set> -> 'ret
+type SetTeqEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, 'b Set> -> 'ret
+type 'a SetTeqCrate = abstract member Apply : SetTeqEvaluator<'a, 'ret> -> 'ret
 
 [<RequireQualifiedAccess>]
 module SetTeqCrate =
@@ -82,8 +82,8 @@ module SetTeqCrate =
         | _ -> None
 
 
-type 'a MapTeqCrate = abstract member Apply : MapTeqCrateEvaluator<'a, 'ret> -> 'ret
-and MapTeqCrateEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, Map<'k, 'v>> -> 'ret
+type MapTeqEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, Map<'k, 'v>> -> 'ret
+type 'a MapTeqCrate = abstract member Apply : MapTeqEvaluator<'a, 'ret> -> 'ret
 
 [<RequireQualifiedAccess>]
 module MapTeqCrate =
@@ -101,8 +101,8 @@ module MapTeqCrate =
         | _ -> None
 
 
-type 'a DictionaryTeqCrate = abstract member Apply : DictionaryTeqCrateEvaluator<'a, 'ret> -> 'ret
-and DictionaryTeqCrateEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, Dictionary<'k, 'v>> -> 'ret
+type DictionaryTeqEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, Dictionary<'k, 'v>> -> 'ret
+type 'a DictionaryTeqCrate = abstract member Apply : DictionaryTeqEvaluator<'a, 'ret> -> 'ret
 
 [<RequireQualifiedAccess>]
 module DictionaryTeqCrate =
@@ -120,8 +120,8 @@ module DictionaryTeqCrate =
         | _ -> None
 
 
-type 'a ResizeArrayTeqCrate = abstract member Apply : ResizeArrayTeqCrateEvaluator<'a, 'ret> -> 'ret
-and ResizeArrayTeqCrateEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, 'b ResizeArray> -> 'ret
+type ResizeArrayTeqEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, 'b ResizeArray> -> 'ret
+type 'a ResizeArrayTeqCrate = abstract member Apply : ResizeArrayTeqEvaluator<'a, 'ret> -> 'ret
 
 [<RequireQualifiedAccess>]
 module ResizeArrayTeqCrate =
@@ -139,8 +139,8 @@ module ResizeArrayTeqCrate =
         | _ -> None
 
 
-type 'a FunTeqCrate = abstract member Apply : FunTeqCrateEvaluator<'a, 'ret> -> 'ret
-and FunTeqCrateEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, 'b -> 'c> -> 'ret
+type FunTeqEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, 'b -> 'c> -> 'ret
+type 'a FunTeqCrate = abstract member Apply : FunTeqEvaluator<'a, 'ret> -> 'ret
 
 [<RequireQualifiedAccess>]
 module FunTeqCrate =
@@ -163,8 +163,8 @@ module FunTeqCrate =
         | _ -> None
 
 
-type 'a PairTeqCrate = abstract member Apply : PairTeqCrateEvaluator<'a, 'ret> -> 'ret
-and PairTeqCrateEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, 'b * 'c> -> 'ret
+type PairTeqEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, 'b * 'c> -> 'ret
+type 'a PairTeqCrate = abstract member Apply : PairTeqEvaluator<'a, 'ret> -> 'ret
 
 [<RequireQualifiedAccess>]
 module PairTeqCrate =
@@ -182,8 +182,8 @@ module PairTeqCrate =
         | _ -> None
 
 
-type 'a TripleTeqCrate = abstract member Apply : TripleTeqCrateEvaluator<'a, 'ret> -> 'ret
-and TripleTeqCrateEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, 'b * 'c * 'd> -> 'ret
+type TripleTeqEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, 'b * 'c * 'd> -> 'ret
+type 'a TripleTeqCrate = abstract member Apply : TripleTeqEvaluator<'a, 'ret> -> 'ret
 
 [<RequireQualifiedAccess>]
 module TripleTeqCrate =

@@ -2,24 +2,24 @@
 
 open HCollections
 
-type 'tuple TupleConvCrate = abstract member Apply : TupleConvCrateEvaluator<'tuple, 'ret> -> 'ret
-and TupleConvCrateEvaluator<'tuple, 'ret> = abstract member Eval : 'ts TypeList -> Conv<'tuple, 'ts HList> -> 'ret
+type TupleConvEvaluator<'tuple, 'ret> = abstract member Eval : 'ts TypeList -> Conv<'tuple, 'ts HList> -> 'ret
+type 'tuple TupleConvCrate = abstract member Apply : TupleConvEvaluator<'tuple, 'ret> -> 'ret
 
 module TupleConvCrate =
 
     val tryMake : unit -> 'tuple TupleConvCrate option
 
 
-type 'record RecordConvCrate = abstract member Apply : RecordConvCrateEvaluator<'record, 'ret> -> 'ret
-and RecordConvCrateEvaluator<'record, 'ret> = abstract member Eval : string list -> 'ts TypeList -> Conv<'record, 'ts HList> -> 'ret
+type RecordConvEvaluator<'record, 'ret> = abstract member Eval : string list -> 'ts TypeList -> Conv<'record, 'ts HList> -> 'ret
+type 'record RecordConvCrate = abstract member Apply : RecordConvEvaluator<'record, 'ret> -> 'ret
 
 module RecordConvCrate =
 
     val tryMake : unit -> 'record RecordConvCrate option
 
 
-type 'union UnionConvCrate = abstract member Apply : UnionConvCrateEvaluator<'union, 'ret> -> 'ret
-and UnionConvCrateEvaluator<'union, 'ret> = abstract member Eval : string list -> 'ts TypeList -> Conv<'union, 'ts HUnion> -> 'ret
+type UnionConvEvaluator<'union, 'ret> = abstract member Eval : string list -> 'ts TypeList -> Conv<'union, 'ts HUnion> -> 'ret
+type 'union UnionConvCrate = abstract member Apply : UnionConvEvaluator<'union, 'ret> -> 'ret
 
 module UnionConvCrate =
 

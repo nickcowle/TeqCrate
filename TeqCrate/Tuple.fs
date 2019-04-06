@@ -10,7 +10,7 @@ module Tuple =
         match tType<'t> with
         | Tuple c ->
             c.Apply
-                { new TupleConvCrateEvaluator<_,_> with
+                { new TupleConvEvaluator<_,_> with
                     member __.Eval _ conv =
                         tuple |> conv.To |> HList.fold folder s
                 }

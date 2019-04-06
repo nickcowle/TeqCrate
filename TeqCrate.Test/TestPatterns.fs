@@ -25,7 +25,7 @@ module TestPatterns =
         match tType<'a> with
         | Array c ->
             c.Apply
-                { new ArrayTeqCrateEvaluator<_,_> with
+                { new ArrayTeqEvaluator<_,_> with
                     member __.Eval teq = (Teq.castTo teq arr).Length |> Some
                 }
         | _ -> None
@@ -40,7 +40,7 @@ module TestPatterns =
         match tType<'a> with
         | List c ->
             c.Apply
-                { new ListTeqCrateEvaluator<_,_> with
+                { new ListTeqEvaluator<_,_> with
                     member __.Eval teq = xs |> Teq.castTo teq |> List.length |> Some
                 }
         | _ -> None
@@ -55,7 +55,7 @@ module TestPatterns =
         match tType<'a> with
         | Map c ->
             c.Apply
-                { new MapTeqCrateEvaluator<_,_> with
+                { new MapTeqEvaluator<_,_> with
                     member __.Eval teq = map |> Teq.castTo teq |> Map.count |> Some
                 }
         | _ -> None
@@ -80,7 +80,7 @@ module TestPatterns =
         | Fun c ->
             let dom, ran =
                 c.Apply
-                    { new FunTeqCrateEvaluator<_,_> with
+                    { new FunTeqEvaluator<_,_> with
                         member __.Eval (teq : Teq<int -> string, 'a -> 'b>) =
                             typeof<'a>, typeof<'b>
                     }
@@ -97,7 +97,7 @@ module TestPatterns =
         | Pair c ->
             let t1, t2 =
                 c.Apply
-                    { new PairTeqCrateEvaluator<_,_> with
+                    { new PairTeqEvaluator<_,_> with
                         member __.Eval (teq : Teq<int * string, 'a * 'b>) =
                             typeof<'a>, typeof<'b>
                     }
@@ -114,7 +114,7 @@ module TestPatterns =
         | Triple c ->
             let t1, t2, t3 =
                 c.Apply
-                    { new TripleTeqCrateEvaluator<_,_> with
+                    { new TripleTeqEvaluator<_,_> with
                         member __.Eval (teq : Teq<int * string * bool, 'a * 'b * 'c>) =
                             typeof<'a>, typeof<'b>, typeof<'c>
                     }
@@ -136,7 +136,7 @@ module TestPatterns =
         match tType<'a> with
         | Record c ->
             c.Apply
-                { new RecordConvCrateEvaluator<_,_> with
+                { new RecordConvEvaluator<_,_> with
                     member __.Eval names _ conv =
 
                         let folder =
@@ -177,7 +177,7 @@ module TestPatterns =
             match tType<TestUnion> with
             | Union c ->
                 c.Apply
-                    { new UnionConvCrateEvaluator<_,_> with
+                    { new UnionConvEvaluator<_,_> with
                         member __.Eval names ts (conv : Conv<TestUnion, 'a HUnion>) =
 
                             let expectedNames = [ "Foo" ; "Bar" ; "Baz" ; "Quux" ]
