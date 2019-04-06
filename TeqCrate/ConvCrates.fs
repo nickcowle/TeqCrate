@@ -5,20 +5,6 @@ open Microsoft.FSharp.Reflection
 open System
 open TeqCrate.TypePatterns
 
-[<NoComparison>]
-[<NoEquality>]
-type Conv<'a, 'b> =
-    {
-        To : 'a -> 'b
-        From : 'b -> 'a
-    }
-
-[<RequireQualifiedAccess>]
-module private Conv =
-
-    let make toF fromF =
-        { To = toF ; From = fromF }
-
 
 type private ObjListHListConvCrate = abstract member Apply : ObjListHListConvCrateEvaluator<'ret> -> 'ret
 and private ObjListHListConvCrateEvaluator<'ret> = abstract member Eval : Conv<obj list, 'a HList> -> 'ret

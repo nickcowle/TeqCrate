@@ -13,6 +13,7 @@
     <Compile Include="TypePatterns.fs" />
     <Compile Include="Type.fs" />
     <Compile Include="TeqCrates.fs" />
+    <Compile Include="Conv.fs" />
     <Compile Include="ConvCrates.fs" />
     <Compile Include="Patterns.fs" />
     <Compile Include="Tuple.fs" />
