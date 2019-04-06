@@ -137,7 +137,7 @@ module TestPatterns =
         | Record c ->
             c.Apply
                 { new RecordConvCrateEvaluator<_,_> with
-                    member __.Eval names conv =
+                    member __.Eval names _ conv =
 
                         let folder =
                             let f (names : string list, map) (value : string option) =
@@ -178,7 +178,7 @@ module TestPatterns =
             | Union c ->
                 c.Apply
                     { new UnionConvCrateEvaluator<_,_> with
-                        member __.Eval names (conv : Conv<TestUnion, 'a HUnion>) =
+                        member __.Eval names ts (conv : Conv<TestUnion, 'a HUnion>) =
 
                             let expectedNames = [ "Foo" ; "Bar" ; "Baz" ; "Quux" ]
                             Assert.Equal<string list>(expectedNames, names)
@@ -191,7 +191,9 @@ module TestPatterns =
                                 | Choice1Of2 v -> false
                                 | Choice2Of2 union ->
                                     match HUnion.split union with
-                                    | Choice1Of2 hList -> true
+                                    | Choice1Of2 (i : int, s : string, b : bool) ->
+                                        let convertedBack = converted |> Teq.castFrom teq |> conv.From
+                                        true
                                     | Choice2Of2 _ -> false
                             | _ ->
                                 false

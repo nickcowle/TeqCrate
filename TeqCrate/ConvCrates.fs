@@ -2,242 +2,207 @@
 
 open HCollections
 open Microsoft.FSharp.Reflection
-open System
-open TeqCrate.TypePatterns
-
-
-type private ObjListHListConvCrate = abstract member Apply : ObjListHListConvCrateEvaluator<'ret> -> 'ret
-and private ObjListHListConvCrateEvaluator<'ret> = abstract member Eval : Conv<obj list, 'a HList> -> 'ret
-
-[<RequireQualifiedAccess>]
-module private ObjListHListConvCrate =
-
-    let make (conv : Conv<obj list, 'a HList>) : ObjListHListConvCrate =
-        { new ObjListHListConvCrate with
-            member __.Apply e = e.Eval conv
-        }
-
-    let rec makeUntyped (ts : Type list) : ObjListHListConvCrate =
-        match ts with
-        | [] ->
-            Conv.make (fun _ -> HList.empty) (fun _ -> []) |> make
-        | t::ts ->
-            Reflection.invokeStaticMethod <@ makeUntypedInner @> [| t |] [| ts |]
-            |> unbox
-
-    and private makeUntypedInner<'t> (ts : Type list) : ObjListHListConvCrate =
-        (makeUntyped ts).Apply
-            { new ObjListHListConvCrateEvaluator<_> with
-                member __.Eval conv =
-                    let toF os =
-                        match os with
-                        | [] -> raise Unreachable
-                        | o::os -> conv.To os |> HList.cons (o |> unbox<'t>)
-                    let fromF hList =
-                        let o = hList |> HList.head
-                        let os = hList |> HList.tail |> conv.From
-                        (box o)::os
-                    Conv.make toF fromF |> make
-            }
-
-
-type private ObjListTupleConvCrate = abstract member Apply : ObjListTupleConvCrateEvaluator<'ret> -> 'ret
-and private ObjListTupleConvCrateEvaluator<'ret> = abstract member Eval : Conv<obj list, 'tuple> -> 'ret
-
-[<RequireQualifiedAccess>]
-module private ObjListTupleConvCrate =
-
-    let make (conv : Conv<obj list, 'tuple>) : ObjListTupleConvCrate =
-        { new ObjListTupleConvCrate with
-            member __.Apply e = e.Eval conv
-        }
-
-    let rec makeUntyped (ts : Type list) : ObjListTupleConvCrate =
-
-        match ts with
-        | [] ->
-            let toF (os : obj list) : unit = ()
-            let fromF (t : unit) : obj list = []
-            Conv.make toF fromF |> make
-        | [ t ] ->
-            Reflection.invokeStaticMethod <@ makeUntypedInnerSingle @> ts [| |]
-            |> unbox
-        | _ ->
-            let tupleType = ts |> Array.ofList |> FSharpType.MakeTupleType
-            Reflection.invokeStaticMethod <@ makeUntypedInner @> [| tupleType |] [| |]
-            |> unbox
-
-    and makeUntypedInnerSingle<'a> () : ObjListTupleConvCrate =
-        let toF os = os |> List.exactlyOne |> unbox<'a>
-        let fromF a = [ box a ]
-        Conv.make toF fromF |> make
-
-    and makeUntypedInner<'tuple> () : ObjListTupleConvCrate =
-        let tupleType = typeof<'tuple>
-        let reader = FSharpValue.PreComputeTupleReader tupleType
-        let constructor = FSharpValue.PreComputeTupleConstructor tupleType
-        let toF = Array.ofList >> constructor >> unbox<'tuple>
-        let fromF = box >> reader >> List.ofArray
-        Conv.make toF fromF |> make
-
+open TypePatterns
 
 type 'tuple TupleConvCrate = abstract member Apply : TupleConvCrateEvaluator<'tuple, 'ret> -> 'ret
-and TupleConvCrateEvaluator<'tuple, 'ret> = abstract member Eval : Conv<'tuple, 'b HList> -> 'ret
+and TupleConvCrateEvaluator<'tuple, 'ret> = abstract member Eval : 'ts TypeList -> Conv<'tuple, 'ts HList> -> 'ret
 
-[<RequireQualifiedAccess>]
 module TupleConvCrate =
 
-    let make (conv : Conv<'a, 'b HList>) : 'a TupleConvCrate =
-            { new TupleConvCrate<_> with
-                member __.Apply e = e.Eval conv
-            }
-
-    let tryMake () : 'a TupleConvCrate option =
-
-        let t = typeof<'a>
-
-        match t with
-        | Tuple ts ->
-            let crate = ts |> ObjListHListConvCrate.makeUntyped
-            crate.Apply
-                { new ObjListHListConvCrateEvaluator<_> with
-                    member __.Eval conv =
-
-                        let reader = FSharpValue.PreComputeTupleReader t
-                        let toF (tuple : 'a) : _ HList =
-                            tuple |> reader |> List.ofArray |> conv.To
-
-                        let constructor = FSharpValue.PreComputeTupleConstructor t
-                        let fromF (hList : _ HList) : 'a =
-                            hList |> conv.From |> Array.ofList |> constructor |> unbox
-
-                        Conv.make toF fromF |> make |> Some
-                }
-        | _ ->
-            None
-
-
-type 'a RecordConvCrate = abstract member Apply : RecordConvCrateEvaluator<'a, 'ret> -> 'ret
-and RecordConvCrateEvaluator<'a, 'ret> = abstract member Eval : string list -> Conv<'a, 'b HList> -> 'ret
-
-[<RequireQualifiedAccess>]
-module RecordConvCrate =
-
-    let make (names : string list) (conv : Conv<'a, 'b HList>) : 'a RecordConvCrate =
-            { new RecordConvCrate<_> with
-                member __.Apply e = e.Eval names conv
-            }
-
-    let tryMake () : 'a RecordConvCrate option =
-
-        let t = typeof<'a>
-
-        match t with
-        | Record fs ->
-            let crate = fs |> List.map snd |> ObjListHListConvCrate.makeUntyped
-            crate.Apply
-                { new ObjListHListConvCrateEvaluator<_> with
-                    member __.Eval conv =
-
-                        let reader = FSharpValue.PreComputeRecordReader(t, true)
-                        let toF (record : 'a) : _ HList =
-                            record |> reader |> List.ofArray |> conv.To
-
-                        let constructor = FSharpValue.PreComputeRecordConstructor(t, true)
-                        let fromF (hList : _ HList) : 'a =
-                            hList |> conv.From |> Array.ofList |> constructor |> unbox
-
-                        make (fs |> List.map fst) (Conv.make toF fromF)
-                }
-                |> Some
-        | _ ->
-            None
-
-type private UnionCaseConvCrate = abstract member Apply : UnionCaseConvCrateEvaluator<'ret> -> 'ret
-and private UnionCaseConvCrateEvaluator<'ret> = abstract member Eval : Conv<UnionCaseInfo * obj list, 'a HUnion> -> 'a HUnionTail -> 'ret
-
-[<RequireQualifiedAccess>]
-module private UnionCaseConvCrate =
-
-    let make conv tail =
-        { new UnionCaseConvCrate with
-            member __.Apply e = e.Eval conv tail
+    let make ts conv =
+        { new TupleConvCrate<_> with
+            member __.Apply e = e.Eval ts conv
         }
 
-    let convCrateForCase (case : UnionCaseInfo) =
-        let caseFields = case.GetFields () |> Seq.map (fun f -> f.PropertyType) |> List.ofSeq
-        ObjListTupleConvCrate.makeUntyped caseFields
+    let rec makeUntyped ts =
+        match ts with
+        | [] ->
+            let toF _ = HList.empty
+            let fromF _ = []
+            Conv.make toF fromF |> make TypeList.empty
+        | t::ts ->
+            Reflection.invokeStaticMethod <@ makeUntypedInner @> [ t ] [ ts ] |> unbox
 
-    let rec makeUntyped (cases : UnionCaseInfo list) : UnionCaseConvCrate =
-        match cases with
-        | [] -> raise Unreachable
-        | [case] ->
-            (convCrateForCase case).Apply
-                { new ObjListTupleConvCrateEvaluator<_> with
-                    member __.Eval conv =
-                        let toF (_, os) = os |> conv.To |> HUnion.make HUnionTail.empty
-                        let fromF union =
-                            match HUnion.split union with
-                            | Choice1Of2 tuple -> case, conv.From tuple
-                            | Choice2Of2 _ -> raise Unreachable
-                        make (Conv.make toF fromF) (HUnionTail.empty |> HUnionTail.extend)
-                }
-        | case::cases ->
-            (convCrateForCase case).Apply
-                { new ObjListTupleConvCrateEvaluator<_> with
-                    member __.Eval caseConv =
-                        let crate = makeUntyped cases
-                        crate.Apply
-                            { new UnionCaseConvCrateEvaluator<_> with
-                                member __.Eval unionConv tail =
-                                    let toF (c, os) =
-                                        if c = case then
-                                            os |> caseConv.To |> HUnion.make tail
-                                        else
-                                            (c, os) |> unionConv.To |> HUnion.extend
-                                    let fromF union =
-                                        match HUnion.split union with
-                                        | Choice1Of2 tuple -> case, caseConv.From tuple
-                                        | Choice2Of2 union -> unionConv.From union
-                                    make (Conv.make toF fromF) (tail |> HUnionTail.extend)
-                            }
-                }
-
-
-type 'a UnionConvCrate = abstract member Apply : UnionConvCrateEvaluator<'a, 'ret> -> 'ret
-and UnionConvCrateEvaluator<'a, 'ret> = abstract member Eval : string list -> Conv<'a, 'b HUnion> -> 'ret
-
-[<RequireQualifiedAccess>]
-module UnionConvCrate =
-
-    let make (names : string list) (conv : Conv<'a, 'b HUnion>) : 'a UnionConvCrate =
-            { new UnionConvCrate<_> with
-                member __.Apply e = e.Eval names conv
+    and makeUntypedInner<'t> ts =
+        let crate = makeUntyped ts
+        crate.Apply
+            { new TupleConvCrateEvaluator<_,_> with
+                member __.Eval ts conv =
+                    let toF os =
+                        let t = os |> List.head |> unbox<'t>
+                        os |> List.tail |> conv.To |> HList.cons t
+                    let fromF xs =
+                        let o = xs |> HList.head |> box
+                        let os = xs |> HList.tail |> conv.From
+                        o::os
+                    Conv.make toF fromF |> make (ts |> TypeList.cons)
             }
 
-    let tryMake () : 'a UnionConvCrate option =
+    let tryMake () : 'tuple TupleConvCrate option =
 
-        let t = typeof<'a>
+        let t = typeof<'tuple>
+        match t with
+        | Tuple ts ->
+            let tupleConv =
+                let make = FSharpValue.PreComputeTupleConstructor t
+                let reader = FSharpValue.PreComputeTupleReader t
+                Conv.make (reader >> Array.toList) (List.toArray >> make >> unbox)
 
+            let crate = makeUntyped ts
+            crate.Apply
+                { new TupleConvCrateEvaluator<_,_> with
+                    member __.Eval ts conv = Conv.compose tupleConv conv |> make ts
+                }
+            |> Some
+
+        | _ -> None
+
+
+type 'record RecordConvCrate = abstract member Apply : RecordConvCrateEvaluator<'record, 'ret> -> 'ret
+and RecordConvCrateEvaluator<'record, 'ret> = abstract member Eval : string list -> 'ts TypeList -> Conv<'record, 'ts HList> -> 'ret
+
+module RecordConvCrate =
+
+    let make names tl conv =
+        { new RecordConvCrate<_> with
+            member __.Apply e = e.Eval names tl conv
+        }
+
+    let rec makeUntyped names tl ts =
+        match ts with
+        | [] ->
+            let toF _ = HList.empty
+            let fromF _ = []
+            Conv.make toF fromF |> make names tl
+        | t::ts ->
+            Reflection.invokeStaticMethod <@ makeUntypedInner @> [ t ] [ names ; tl ; ts ; ] |> unbox
+
+    and makeUntypedInner<'t> names tl ts =
+        let crate = makeUntyped names tl ts
+        crate.Apply
+            { new RecordConvCrateEvaluator<_,_> with
+                member __.Eval names tl conv =
+                    let toF os =
+                        let t = os |> List.head |> unbox<'t>
+                        os |> List.tail |> conv.To |> HList.cons t
+                    let fromF xs =
+                        let o = xs |> HList.head |> box
+                        let os = xs |> HList.tail |> conv.From
+                        o::os
+                    Conv.make toF fromF |> make names (tl |> TypeList.cons)
+            }
+
+    let tryMake () : 'record RecordConvCrate option =
+
+        let t = typeof<'record>
+        match t with
+        | Record ts ->
+            let recordConv =
+                let make = FSharpValue.PreComputeRecordConstructor t
+                let reader = FSharpValue.PreComputeRecordReader t
+                Conv.make (reader >> Array.toList) (List.toArray >> make >> unbox)
+
+            let names, ts = ts |> List.unzip
+            let crate = makeUntyped names TypeList.empty ts
+            crate.Apply
+                { new RecordConvCrateEvaluator<_,_> with
+                    member __.Eval names tl conv =
+                        Conv.compose recordConv conv |> make names tl
+                }
+            |> Some
+
+        | _ -> None
+
+
+type 'union UnionConvCrate = abstract member Apply : UnionConvCrateEvaluator<'union, 'ret> -> 'ret
+and UnionConvCrateEvaluator<'union, 'ret> = abstract member Eval : string list -> 'ts TypeList -> Conv<'union, 'ts HUnion> -> 'ret
+
+module UnionConvCrate =
+
+    let make names ts conv =
+        { new UnionConvCrate<_> with
+            member __.Apply e = e.Eval names ts conv
+        }
+
+    let rec makeUntyped names ts : (int * obj) UnionConvCrate =
+        match ts with
+        | [] -> failwith "Cannot create UnionConvCrate - the list of union cases must not be empty"
+        | t::ts ->
+            Reflection.invokeStaticMethod <@ makeUntypedInner @> [ t ] [ names ; ts ]
+            |> unbox
+
+    and makeUntypedInner<'t> names ts : (int * obj) UnionConvCrate =
+        match ts with
+        | [] ->
+            let toF (_, o) = o |> unbox<'t> |> HUnion.make TypeList.empty
+            let fromF xs = 0, HUnion.getSingleton xs |> box
+            let ts = TypeList.empty |> TypeList.cons
+            Conv.make toF fromF |> make names ts
+        | _ ->
+            let crate = makeUntyped names ts
+            crate.Apply
+                { new UnionConvCrateEvaluator<_,_> with
+                    member __.Eval names ts conv =
+                        let toF (i, o) =
+                            if i = 0 then o |> unbox<'t> |> HUnion.make ts
+                            else (i - 1, o) |> conv.To |> HUnion.extend
+                        let fromF (xs : ('t -> 'a) HUnion) : int * obj =
+                            match xs |> HUnion.split with
+                            | Choice1Of2 x -> 0, x |> box
+                            | Choice2Of2 xs ->
+                                let (i, x) = conv.From xs
+                                i + 1, x
+                        let ts = ts |> TypeList.cons
+                        Conv.make toF fromF |> make names ts
+                }
+
+    let tryMake () : 'union UnionConvCrate option =
+
+        let t = typeof<'union>
         match t with
         | Union cases ->
-            let crate = cases |> UnionCaseConvCrate.makeUntyped
+
+            let makeConverter =
+                function
+                | [] ->
+                    let conv = Conv.make (fun _ -> () |> box) (fun _ -> [||])
+                    typeof<unit>, conv
+                | [t] ->
+                    let conv = Conv.make Array.head Array.singleton
+                    t, conv
+                | ts ->
+                    let t = ts |> Array.ofList |> FSharpType.MakeTupleType
+                    let maker = FSharpValue.PreComputeTupleConstructor t
+                    let reader = FSharpValue.PreComputeTupleReader t
+                    let conv = Conv.make maker reader
+                    t, conv
+
+            let makeCaseConv case : Conv<obj, obj array> =
+                let reader = FSharpValue.PreComputeUnionReader case
+                let maker = FSharpValue.PreComputeUnionConstructor case
+                Conv.make reader maker
+
+            let bitsForCase (case : UnionCaseInfo) =
+                let ts = case.GetFields () |> Array.map (fun pi -> pi.PropertyType) |> List.ofArray
+                let t, conv = makeConverter ts
+                t, Conv.compose (makeCaseConv case) conv
+
+            let ts, convs = cases |> List.map bitsForCase |> List.unzip
+            let convs = convs |> Array.ofList
+
+            let unionConv : Conv<'union, int * obj> =
+                let getTag = FSharpValue.PreComputeUnionTagReader t
+                let toF u = let i = getTag u in i, convs.[i].To u
+                let fromF (i, o) = o |> convs.[i].From |> unbox
+                Conv.make toF fromF
+
+            let names = cases |> List.map (fun case -> case.Name)
+            let crate = makeUntyped names ts
             crate.Apply
-                { new UnionCaseConvCrateEvaluator<_> with
-                    member __.Eval conv tail =
-
-                        let toF (union : 'a) : _ HUnion =
-                            let case, os = FSharpValue.GetUnionFields(union, t, true)
-                            conv.To (case, os |> List.ofSeq)
-
-                        let fromF (hList : _ HUnion) : 'a =
-                            let case, os = hList |> conv.From
-                            FSharpValue.MakeUnion(case, os |> Array.ofList) |> unbox
-
-                        let names = cases |> Seq.map (fun c -> c.Name) |> List.ofSeq
-
-                        make names (Conv.make toF fromF)
+                { new UnionConvCrateEvaluator<_,_> with
+                    member __.Eval names ts conv =
+                        Conv.compose unionConv conv |> make names ts
                 }
-                |> Some
-        | _ ->
-            None
+            |> Some
+
+        | _ -> None

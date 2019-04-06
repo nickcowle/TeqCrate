@@ -11,7 +11,7 @@ module Tuple =
         | Tuple c ->
             c.Apply
                 { new TupleConvCrateEvaluator<_,_> with
-                    member __.Eval conv =
+                    member __.Eval _ conv =
                         tuple |> conv.To |> HList.fold folder s
                 }
             |> Some
