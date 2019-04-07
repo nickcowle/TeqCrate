@@ -2,6 +2,7 @@
 
 open HCollections
 open Microsoft.FSharp.Reflection
+open System
 open TypePatterns
 
 type TupleConvEvaluator<'tuple, 'ret> = abstract member Eval : 'ts TypeList -> Conv<'tuple, 'ts HList> -> 'ret
@@ -14,16 +15,20 @@ module TupleConvCrate =
             member __.Apply e = e.Eval ts conv
         }
 
-    let rec makeUntyped ts =
+    let rec makeUntyped (ts : Type list) : obj list TupleConvCrate =
         match ts with
         | [] ->
             let toF _ = HList.empty
             let fromF _ = []
             Conv.make toF fromF |> make TypeList.empty
         | t::ts ->
-            Reflection.invokeStaticMethod <@ makeUntypedInner @> [ t ] [ ts ] |> unbox
+            let crate = TypeParameterCrate.makeUntyped t
+            crate.Apply
+                { new TypeParameterEvaluator<_> with
+                    member __.Eval<'t> () = makeUntypedInner<'t> ts
+                }
 
-    and makeUntypedInner<'t> ts =
+    and makeUntypedInner<'t> (ts : Type list) : obj list TupleConvCrate =
         let crate = makeUntyped ts
         crate.Apply
             { new TupleConvEvaluator<_,_> with
@@ -68,16 +73,20 @@ module RecordConvCrate =
             member __.Apply e = e.Eval names tl conv
         }
 
-    let rec makeUntyped names tl ts =
+    let rec makeUntyped<'ts> (names : string list) (tl : 'ts TypeList) (ts : Type list) : obj list RecordConvCrate =
         match ts with
         | [] ->
             let toF _ = HList.empty
             let fromF _ = []
-            Conv.make toF fromF |> make names tl
+            Conv.make toF fromF |> make names TypeList.empty
         | t::ts ->
-            Reflection.invokeStaticMethod <@ makeUntypedInner @> [ t ] [ names ; tl ; ts ; ] |> unbox
+            let crate = TypeParameterCrate.makeUntyped t
+            crate.Apply
+                { new TypeParameterEvaluator<_> with
+                    member __.Eval<'t> () = makeUntypedInner<'t, 'ts> names tl ts
+                }
 
-    and makeUntypedInner<'t> names tl ts =
+    and makeUntypedInner<'t, 'ts> (names : string list) (tl : 'ts TypeList) (ts : Type list) : obj list RecordConvCrate =
         let crate = makeUntyped names tl ts
         crate.Apply
             { new RecordConvEvaluator<_,_> with
@@ -124,14 +133,17 @@ module UnionConvCrate =
             member __.Apply e = e.Eval names ts conv
         }
 
-    let rec makeUntyped names ts : (int * obj) UnionConvCrate =
+    let rec makeUntyped (names : string list) (ts : Type list) : (int * obj) UnionConvCrate =
         match ts with
         | [] -> failwith "Cannot create UnionConvCrate - the list of union cases must not be empty"
         | t::ts ->
-            Reflection.invokeStaticMethod <@ makeUntypedInner @> [ t ] [ names ; ts ]
-            |> unbox
+            let crate = TypeParameterCrate.makeUntyped t
+            crate.Apply
+                { new TypeParameterEvaluator<_> with
+                    member __.Eval<'t> () = makeUntypedInner<'t> names ts
+                }
 
-    and makeUntypedInner<'t> names ts : (int * obj) UnionConvCrate =
+    and makeUntypedInner<'t> (names : string list) (ts : Type list) : (int * obj) UnionConvCrate =
         match ts with
         | [] ->
             let toF (_, o) = o |> unbox<'t> |> HUnion.make TypeList.empty

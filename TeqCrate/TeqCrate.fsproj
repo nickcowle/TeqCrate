@@ -10,6 +10,7 @@
   <ItemGroup>
     <Compile Include="Unreachable.fs" />
     <Compile Include="Reflection.fs" />
+    <Compile Include="TypeParameterCrate.fs" />
     <Compile Include="TypePatterns.fs" />
     <Compile Include="Type.fs" />
     <Compile Include="TeqCrates.fs" />
