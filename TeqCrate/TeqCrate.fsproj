@@ -12,6 +12,7 @@
     <Compile Include="Reflection.fs" />
     <Compile Include="TypeParameterCrate.fs" />
     <Compile Include="TypePatterns.fs" />
+    <Compile Include="Type.fsi" />
     <Compile Include="Type.fs" />
     <Compile Include="TeqCrates.fs" />
     <Compile Include="Conv.fs" />
