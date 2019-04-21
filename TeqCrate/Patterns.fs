@@ -49,3 +49,6 @@ module Patterns =
 
     let (|Union|_|) (_ : 'a TType) : 'a UnionConvCrate option =
         UnionConvCrate.tryMake ()
+
+    let (|SumOfProducts|_|) (_ : 'a TType) : 'a SumOfProductsConvCrate option =
+        SumOfProductsConvCrate.tryMake ()

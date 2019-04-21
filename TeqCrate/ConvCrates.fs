@@ -218,3 +218,112 @@ module UnionConvCrate =
             |> Some
 
         | _ -> None
+
+
+type SumOfProductsConvEvaluator<'union, 'ret> = abstract member Eval : string list -> 'tss TypeListList -> Conv<'union, 'tss SumOfProducts> -> 'ret
+type 'union SumOfProductsConvCrate = abstract member Apply : SumOfProductsConvEvaluator<'union, 'ret> -> 'ret
+
+module SumOfProductsConvCrate =
+
+    let make names tss conv =
+        { new SumOfProductsConvCrate<_> with
+            member __.Apply e = e.Eval names tss conv
+        }
+
+    let rec makeUntyped (names : string list) (tss : TypeListCrate list) : (int * obj) SumOfProductsConvCrate =
+        match tss with
+        | [] -> failwith "Cannot create SumOfProductsConvCrate - the list of union cases must not be empty"
+        | ts::tss ->
+            ts.Apply
+                { new TypeListEvaluator<_> with
+                    member __.Eval ts = makeUntypedInner<'ts> ts names tss
+                }
+
+    and makeUntypedInner<'ts> (tl : 'ts TypeList) (names : string list) (tss : TypeListCrate list) : (int * obj) SumOfProductsConvCrate =
+        match tss with
+        | [] ->
+            let toF (_, o) = o |> unbox<'ts HList> |> SumOfProducts.make TypeListList.empty
+            let fromF xs = 0, SumOfProducts.getSingleton xs |> box
+            let tl = TypeListList.empty |> TypeListList.cons tl
+            Conv.make toF fromF |> make names tl
+        | _ ->
+            let crate = makeUntyped names tss
+            crate.Apply
+                { new SumOfProductsConvEvaluator<_,_> with
+                    member __.Eval names tss conv =
+                        let toF (i, o) =
+                            if i = 0 then o |> unbox<'ts HList> |> SumOfProducts.make tss
+                            else (i - 1, o) |> conv.To |> SumOfProducts.extend tl
+                        let fromF (xs : ('ts -> 'a) SumOfProducts) : int * obj =
+                            match xs |> SumOfProducts.split with
+                            | Choice1Of2 x -> 0, x |> box
+                            | Choice2Of2 xs ->
+                                let (i, x) = conv.From xs
+                                i + 1, x
+                        let tss = tss |> TypeListList.cons tl
+                        Conv.make toF fromF |> make names tss
+                }
+
+    let tryMake () : 'union SumOfProductsConvCrate option =
+
+        let t = typeof<'union>
+        match t with
+        | Union cases ->
+
+            let rec makeConverter (ts : Type list) : TypeListCrate * Conv<obj list, obj> =
+                match ts with
+                | [] ->
+                    let crate = TypeListCrate.make TypeList.empty
+                    let toF _ = HList.empty |> box
+                    let fromF _ = []
+                    crate, Conv.make toF fromF
+                | t::ts ->
+                    let crate = TypeParameterCrate.makeUntyped t
+                    crate.Apply
+                        { new TypeParameterEvaluator<_> with
+                            member __.Eval<'t> () =
+                                let crate, conv = makeConverter ts
+                                crate.Apply
+                                    { new TypeListEvaluator<_> with
+                                        member __.Eval (ts : 'ts TypeList) =
+                                            let crate = ts |> TypeList.cons<'t,'ts> |> TypeListCrate.make
+                                            let toF os =
+                                                let head = os |> List.head |> unbox<'t>
+                                                os |> List.tail |> conv.To |> unbox<'ts HList> |> HList.cons head |> box
+                                            let fromF o =
+                                                let xs = o |> unbox<('t -> 'ts) HList>
+                                                (xs |> HList.head |> box)::(xs |> HList.tail |> box |> conv.From)
+                                            crate, Conv.make toF fromF
+                                    }
+                        }
+
+            let makeCaseConv case : Conv<obj, obj array> =
+                let reader = FSharpValue.PreComputeUnionReader case
+                let maker = FSharpValue.PreComputeUnionConstructor case
+                Conv.make reader maker
+
+            let bitsForCase (case : UnionCaseInfo) =
+                let ts = case.GetFields () |> Array.map (fun pi -> pi.PropertyType) |> List.ofArray
+                let crate, conv = makeConverter ts
+                let conv2 = Conv.make Array.toList List.toArray
+                crate, Conv.compose (makeCaseConv case) (Conv.compose conv2 conv)
+
+            let ts, convs = cases |> List.map bitsForCase |> List.unzip
+            let convs = convs |> Array.ofList
+
+            let unionConv : Conv<'union, int * obj> =
+                let getTag = FSharpValue.PreComputeUnionTagReader t
+                let toF u = let i = getTag u in i, convs.[i].To u
+                let fromF (i, o) = o |> convs.[i].From |> unbox
+                Conv.make toF fromF
+
+            let names = cases |> List.map (fun case -> case.Name)
+            let crate = makeUntyped names ts
+            crate.Apply
+                { new SumOfProductsConvEvaluator<_,_> with
+                    member __.Eval names ts conv =
+                        Conv.compose unionConv conv |> make names ts
+                }
+            |> Some
+
+        | _ -> None

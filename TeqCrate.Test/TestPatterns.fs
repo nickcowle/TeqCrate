@@ -202,3 +202,38 @@ module TestPatterns =
                 false
 
         Assert.True result
+
+    [<Fact>]
+    let ``SumOfProducts active pattern recognises a union`` () =
+
+        let testValue = Bar (1234, "test", true)
+
+        let result =
+            match tType<TestUnion> with
+            | SumOfProducts c ->
+                c.Apply
+                    { new SumOfProductsConvEvaluator<_,_> with
+                        member __.Eval names ts (conv : Conv<TestUnion, 'a SumOfProducts>) =
+
+                            let expectedNames = [ "Foo" ; "Bar" ; "Baz" ; "Quux" ]
+                            Assert.Equal<string list>(expectedNames, names)
+
+                            let expectedUnionType = tType<(unit -> (int -> string -> bool -> unit) -> (string -> float -> unit) -> (string -> unit) -> unit) SumOfProducts>
+                            match tType<'a SumOfProducts> with
+                            | Teq expectedUnionType teq ->
+                                let converted = testValue |> conv.To |> Teq.castTo teq
+                                match SumOfProducts.split converted with
+                                | Choice1Of2 v -> false
+                                | Choice2Of2 sop ->
+                                    match SumOfProducts.split sop with
+                                    | Choice1Of2 (xs : (int -> string -> bool -> unit) HList) ->
+                                        let convertedBack = converted |> Teq.castFrom teq |> conv.From
+                                        true
+                                    | Choice2Of2 _ -> false
+                            | _ ->
+                                false
+                    }
+            | _ ->
+                false
+
+        Assert.True result

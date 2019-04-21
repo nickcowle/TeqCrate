@@ -24,3 +24,11 @@ type 'union UnionConvCrate = abstract member Apply : UnionConvEvaluator<'union, 
 module UnionConvCrate =
 
     val tryMake : unit -> 'union UnionConvCrate option
+
+
+type SumOfProductsConvEvaluator<'union, 'ret> = abstract member Eval : string list -> 'tss TypeListList -> Conv<'union, 'tss SumOfProducts> -> 'ret
+type 'union SumOfProductsConvCrate = abstract member Apply : SumOfProductsConvEvaluator<'union, 'ret> -> 'ret
+
+module SumOfProductsConvCrate =
+
+    val tryMake : unit -> 'union SumOfProductsConvCrate option
