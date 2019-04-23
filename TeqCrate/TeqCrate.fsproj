@@ -9,17 +9,25 @@
 
   <ItemGroup>
     <Compile Include="Unreachable.fs" />
+    <Compile Include="Reflection.fsi" />
     <Compile Include="Reflection.fs" />
+    <Compile Include="TypeParameterCrate.fsi" />
     <Compile Include="TypeParameterCrate.fs" />
+    <Compile Include="TypeListCrate.fsi" />
     <Compile Include="TypeListCrate.fs" />
+    <Compile Include="TypePatterns.fsi" />
     <Compile Include="TypePatterns.fs" />
     <Compile Include="Type.fsi" />
     <Compile Include="Type.fs" />
+    <Compile Include="TeqCrates.fsi" />
     <Compile Include="TeqCrates.fs" />
+    <Compile Include="Conv.fsi" />
     <Compile Include="Conv.fs" />
     <Compile Include="ConvCrates.fsi" />
     <Compile Include="ConvCrates.fs" />
+    <Compile Include="Patterns.fsi" />
     <Compile Include="Patterns.fs" />
+    <Compile Include="Tuple.fsi" />
     <Compile Include="Tuple.fs" />
   </ItemGroup>
 

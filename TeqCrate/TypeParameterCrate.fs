@@ -16,3 +16,9 @@ module TypeParameterCrate =
     let makeUntyped (t : Type) =
         Reflection.invokeStaticMethod <@ make @> [| t |] [| |]
         |> unbox<TypeParameterCrate>
+
+    let toType (crate : TypeParameterCrate) =
+        crate.Apply
+            { new TypeParameterEvaluator<_> with
+                member __.Eval<'a> () = typeof<'a>
+            }

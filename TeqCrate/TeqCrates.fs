@@ -70,7 +70,7 @@ type 'a SetTeqCrate = abstract member Apply : SetTeqEvaluator<'a, 'ret> -> 'ret
 module SetTeqCrate =
 
     let make<'a when 'a : comparison> () =
-            { new SetTeqCrate<_> with
+            { new SetTeqCrate<'a Set> with
                 member __.Apply e = e.Eval Teq.refl
             }
 
@@ -149,11 +149,6 @@ module FunTeqCrate =
             { new FunTeqCrate<_> with
                 member __.Apply e = e.Eval Teq.refl
             }
-
-    let ofTeq teq =
-        { new FunTeqCrate<_> with
-            member __.Apply e = e.Eval teq
-        }
 
     let tryMake () =
         match typeof<'a> with
