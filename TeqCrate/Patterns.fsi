@@ -1,5 +1,6 @@
 ﻿namespace TeqCrate
 
+open System
 open TypeEquality
 
 /// Contains a set of active patterns to analyse typed runtime Types.
@@ -13,6 +14,27 @@ module Patterns =
     /// Single constructor for TType - creates a TType value of 'a when invoked with any generic
     /// type parameter 'a
     val tType<'a> : 'a TType
+
+    /// Recognises tTypes that represent the bool type.
+    val (|Bool|_|) : 'a TType -> Teq<'a, bool> option
+
+    /// Recognises tTypes that represent the int type.
+    val (|Int|_|) : 'a TType -> Teq<'a, int> option
+
+    /// Recognises tTypes that represent the int64 type.
+    val (|Int64|_|) : 'a TType -> Teq<'a, int64> option
+
+    /// Recognises tTypes that represent the float type.
+    val (|Float|_|) : 'a TType -> Teq<'a, float> option
+
+    /// Recognises tTypes that represent the string type.
+    val (|String|_|) : 'a TType -> Teq<'a, string> option
+
+    /// Recognises tTypes that represent the DateTime type.
+    val (|DateTime|_|) : 'a TType -> Teq<'a, DateTime> option
+
+    /// Recognises tTypes that represent the TimeSpan type.
+    val (|TimeSpan|_|) : 'a TType -> Teq<'a, TimeSpan> option
 
     /// Recognises tTypes that match the second given tType.
     val (|Teq|_|) : 'b TType -> 'a TType -> Teq<'a, 'b> option
