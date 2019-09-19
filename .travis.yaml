@@ -1,0 +1,12 @@
+language: fsharp
+solution: TeqCrate.sln
+dotnet: 2.2.7
+
+matrix:
+    include:
+        - dotnet: 2.2.7
+        - dotnet: 3.0.0-rc1
+
+script:
+    - dotnet restore
+    - dotnet test
