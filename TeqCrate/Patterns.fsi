@@ -30,6 +30,9 @@ module Patterns =
     /// Recognises tTypes that represent the string type.
     val (|String|_|) : 'a TType -> Teq<'a, string> option
 
+    /// Recognises tTypes that represent the unit type.
+    val (|Unit|_|) : 'a TType -> Teq<'a, unit> option
+
     /// Recognises tTypes that represent the DateTime type.
     val (|DateTime|_|) : 'a TType -> Teq<'a, DateTime> option
 
