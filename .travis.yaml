@@ -1,6 +1,5 @@
-language: fsharp
+language: csharp
 solution: TeqCrate.sln
-dotnet: 2.2.7
 
 matrix:
     include:
