@@ -110,14 +110,13 @@ module TestPatterns =
     [<Fact>]
     let ``Unit active pattern recognises a unit`` () =
         // This test is useful because there are certain aspects of F# which behave oddly
-        // in the presence of unit.
+        // in the presence of unit. (It turns out that units are just fine here)
 
         match tType<unit> with
         | Unit teq ->
             Assert.True (Teq.castFrom teq () = ())
 
         | _ -> Assert.True false
-
 
     [<Fact>]
     let ``Triple active pattern recognises a triple`` () =
