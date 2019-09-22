@@ -24,6 +24,9 @@ module Patterns =
     let (|String|_|) (_ : 'a TType) : Teq<'a, string> option =
         Teq.tryRefl<'a, string>
 
+    let (|Unit|_|) (_ : 'a TType) : Teq<'a, unit> option =
+        Teq.tryRefl<'a, unit>
+
     let (|DateTime|_|) (_ : 'a TType) : Teq<'a, DateTime> option =
         Teq.tryRefl<'a, DateTime>
 
