@@ -63,6 +63,25 @@ module SeqTeqCrate =
         | _ -> None
 
 
+type OptionTeqEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, 'b option> -> 'ret
+type 'a OptionTeqCrate = abstract member Apply : OptionTeqEvaluator<'a, 'ret> -> 'ret
+
+[<RequireQualifiedAccess>]
+module OptionTeqCrate =
+
+    let make () =
+            { new OptionTeqCrate<_> with
+                member __.Apply e = e.Eval Teq.refl
+            }
+
+    let tryMake () =
+        match typeof<'a> with
+        | Generic (t, ts) when t = typedefof<_ option> ->
+            Reflection.invokeStaticMethod <@ make @> ts [| |]
+            |> unbox<'a OptionTeqCrate> |> Some
+        | _ -> None
+
+
 type SetTeqEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, 'b Set> -> 'ret
 type 'a SetTeqCrate = abstract member Apply : SetTeqEvaluator<'a, 'ret> -> 'ret
 

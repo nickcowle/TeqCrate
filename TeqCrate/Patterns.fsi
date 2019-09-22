@@ -51,6 +51,9 @@ module Patterns =
     /// Recognises tTypes that represent a seq type.
     val (|Seq|_|) : 'a TType -> 'a SeqTeqCrate option
 
+    /// Recognises tTypes that represent an option type.
+    val (|Option|_|) : 'a TType -> 'a OptionTeqCrate option
+
     /// Recognises tTypes that represent a Set type.
     val (|Set|_|) : 'a TType -> 'a SetTeqCrate option
 

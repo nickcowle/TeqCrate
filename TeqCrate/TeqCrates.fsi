@@ -75,6 +75,30 @@ module SeqTeqCrate =
     val tryMake : unit -> 'a SeqTeqCrate option
 
 
+/// The type of values that act on an OptionTeqEvaluator.
+/// An encoding of a universally quantified function that takes a type equality between its
+/// first type parameter and a 'b option for any 'b and returns a value of type 'ret
+type OptionTeqEvaluator<'a, 'ret> = abstract member Eval : Teq<'a, 'b option> -> 'ret
+
+/// An encoding of an existentially quantified type equality between 'a and a 'b option for some 'b.
+/// Given an OptionTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
+type 'a OptionTeqCrate = abstract member Apply : OptionTeqEvaluator<'a, 'ret> -> 'ret
+
+/// An encoding of an existentially quantified type equality between 'a and a 'b option for some 'b.
+/// Given an OptionTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
+[<RequireQualifiedAccess>]
+module OptionTeqCrate =
+
+    /// For any type 'a, we can create a type equality between 'a option and 'a option, by reflexivity.
+    /// make creates this type equality and then wraps it in an OptionTeqCrate.
+    val make : unit -> 'a option OptionTeqCrate
+
+    /// For any type 'a, checks to see if 'a is actually a 'b option for some 'b.
+    /// If it is, creates the type equality Teq<'a, 'b option> and then wraps it in a crate.
+    /// Otherwise, returns None.
+    val tryMake : unit -> 'a OptionTeqCrate option
+
+
 /// The type of values that act on an SetTeqCrate.
 /// An encoding of a universally quantified function that takes a type equality between its
 /// first type parameter and a 'b Set for any 'b and returns a value of type 'ret

@@ -45,6 +45,9 @@ module Patterns =
     let (|Seq|_|) (_ : 'a TType) : 'a SeqTeqCrate option =
         SeqTeqCrate.tryMake ()
 
+    let (|Option|_|) (_ : 'a TType) : 'a OptionTeqCrate option =
+        OptionTeqCrate.tryMake ()
+
     let (|Set|_|) (_ : 'a TType) : 'a SetTeqCrate option =
         SetTeqCrate.tryMake ()
 
