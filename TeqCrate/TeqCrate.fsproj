@@ -39,7 +39,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="HCollections" Version="0.5.1" />
+    <PackageReference Update="FSharp.Core" Version="4.5.0" />
+    <PackageReference Include="HCollections" Version="0.5.2" />
   </ItemGroup>
 
 </Project>
