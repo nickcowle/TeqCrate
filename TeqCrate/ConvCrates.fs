@@ -1,5 +1,6 @@
 ﻿namespace TeqCrate
 
+open System.Reflection
 open HCollections
 open Microsoft.FSharp.Reflection
 open System
@@ -107,8 +108,9 @@ module RecordConvCrate =
         match t with
         | Record ts ->
             let recordConv =
-                let make = FSharpValue.PreComputeRecordConstructor t
-                let reader = FSharpValue.PreComputeRecordReader t
+                let flags = BindingFlags.Public ||| BindingFlags.NonPublic
+                let make = FSharpValue.PreComputeRecordConstructor (t, flags)
+                let reader = FSharpValue.PreComputeRecordReader (t, flags)
                 Conv.make (reader >> Array.toList) (List.toArray >> make >> unbox)
 
             let names, ts = ts |> List.unzip

@@ -32,7 +32,7 @@ module TypePatterns =
             None
 
     let (|Record|_|) (t : Type) : (string * Type) list option =
-        if FSharpType.IsRecord t then
+        if FSharpType.IsRecord (t, allowAccessToPrivateRepresentation = true) then
             let pis = FSharpType.GetRecordFields(t, true)
             pis |> Seq.map (fun pi -> pi.Name, pi.PropertyType) |> List.ofSeq |> Some
         else
