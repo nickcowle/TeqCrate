@@ -108,15 +108,9 @@ module RecordConvCrate =
         match t with
         | Record ts ->
             let recordConv =
-                let make, reader =
-                    // Public records have a constructor; private ones do not
-                    let isPublic = t.GetConstructors().Length = 1
-                    if isPublic then
-                        FSharpValue.PreComputeRecordConstructor t,
-                        FSharpValue.PreComputeRecordReader t
-                    else
-                        FSharpValue.PreComputeRecordConstructor (t, BindingFlags.NonPublic),
-                        FSharpValue.PreComputeRecordReader (t, BindingFlags.NonPublic)
+                let flags = BindingFlags.Public ||| BindingFlags.NonPublic
+                let make = FSharpValue.PreComputeRecordConstructor (t, flags)
+                let reader = FSharpValue.PreComputeRecordReader (t, flags)
                 Conv.make (reader >> Array.toList) (List.toArray >> make >> unbox)
 
             let names, ts = ts |> List.unzip
