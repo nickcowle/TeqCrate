@@ -282,7 +282,7 @@ module TestPatterns =
 
         Assert.True result
 
-    type private TestInternallyPrivateRecord =
+    type TestInternallyPrivateRecord =
         private
             {
                 InternallyPrivateFoo : string
