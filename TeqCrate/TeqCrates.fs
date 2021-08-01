@@ -12,15 +12,16 @@ type 'a ArrayTeqCrate = abstract member Apply : ArrayTeqEvaluator<'a, 'ret> -> '
 module ArrayTeqCrate =
 
     let make () =
-            { new ArrayTeqCrate<_> with
-                member __.Apply e = e.Eval Teq.refl
-            }
+        { new ArrayTeqCrate<_> with
+            member __.Apply e = e.Eval Teq.refl
+        }
+    let private make' = Reflection.invokeStaticMethod <@ make @>
 
     let tryMake () =
         match typeof<'a> with
         | Array e ->
-            let c = Reflection.invokeStaticMethod <@ make @> [| e |] [| |]
-            c |> unbox<'a ArrayTeqCrate> |> Some
+            make' [| e |] [| |]
+            |> unbox<'a ArrayTeqCrate> |> Some
         | _ ->
             None
 
@@ -32,14 +33,15 @@ type 'a ListTeqCrate = abstract member Apply : ListTeqEvaluator<'a, 'ret> -> 're
 module ListTeqCrate =
 
     let make () =
-            { new ListTeqCrate<_> with
-                member __.Apply e = e.Eval Teq.refl
-            }
+        { new ListTeqCrate<_> with
+            member __.Apply e = e.Eval Teq.refl
+        }
+    let private make' = Reflection.invokeStaticMethod <@ make @>
 
     let tryMake () =
         match typeof<'a> with
         | Generic (t, ts) when t = typedefof<_ list> ->
-            Reflection.invokeStaticMethod <@ make @> ts [| |]
+            make' ts [| |]
             |> unbox<'a ListTeqCrate> |> Some
         | _ -> None
 
@@ -51,14 +53,15 @@ type 'a SeqTeqCrate = abstract member Apply : SeqTeqEvaluator<'a, 'ret> -> 'ret
 module SeqTeqCrate =
 
     let make () =
-            { new SeqTeqCrate<_> with
-                member __.Apply e = e.Eval Teq.refl
-            }
+        { new SeqTeqCrate<_> with
+            member __.Apply e = e.Eval Teq.refl
+        }
+    let private make' = Reflection.invokeStaticMethod <@ make @>
 
     let tryMake () =
         match typeof<'a> with
         | Generic (t, ts) when t = typedefof<_ seq> ->
-            Reflection.invokeStaticMethod <@ make @> ts [| |]
+            make' ts [| |]
             |> unbox<'a SeqTeqCrate> |> Some
         | _ -> None
 
@@ -70,14 +73,15 @@ type 'a OptionTeqCrate = abstract member Apply : OptionTeqEvaluator<'a, 'ret> ->
 module OptionTeqCrate =
 
     let make () =
-            { new OptionTeqCrate<_> with
-                member __.Apply e = e.Eval Teq.refl
-            }
+        { new OptionTeqCrate<_> with
+            member __.Apply e = e.Eval Teq.refl
+        }
+    let private make' = Reflection.invokeStaticMethod <@ make @>
 
     let tryMake () =
         match typeof<'a> with
         | Generic (t, ts) when t = typedefof<_ option> ->
-            Reflection.invokeStaticMethod <@ make @> ts [| |]
+            make' ts [| |]
             |> unbox<'a OptionTeqCrate> |> Some
         | _ -> None
 
@@ -89,14 +93,15 @@ type 'a SetTeqCrate = abstract member Apply : SetTeqEvaluator<'a, 'ret> -> 'ret
 module SetTeqCrate =
 
     let make<'a when 'a : comparison> () =
-            { new SetTeqCrate<'a Set> with
-                member __.Apply e = e.Eval Teq.refl
-            }
+        { new SetTeqCrate<'a Set> with
+            member __.Apply e = e.Eval Teq.refl
+        }
+    let private make' = Reflection.invokeStaticMethod <@ make @>
 
     let tryMake () =
         match typeof<'a> with
         | Generic (t, ts) when t = typedefof<_ Set> ->
-            Reflection.invokeStaticMethod <@ make @> ts [| |]
+            make' ts [| |]
             |> unbox<'a SetTeqCrate> |> Some
         | _ -> None
 
@@ -108,14 +113,15 @@ type 'a MapTeqCrate = abstract member Apply : MapTeqEvaluator<'a, 'ret> -> 'ret
 module MapTeqCrate =
 
     let make<'k, 'v when 'k : comparison> () =
-            { new MapTeqCrate<Map<'k, 'v>> with
-                member __.Apply e = e.Eval Teq.refl
-            }
+        { new MapTeqCrate<Map<'k, 'v>> with
+            member __.Apply e = e.Eval Teq.refl
+        }
+    let private make' = Reflection.invokeStaticMethod <@ make @>
 
     let tryMake () =
         match typeof<'a> with
         | Generic (t, ts) when t = typedefof<Map<_,_>> ->
-            Reflection.invokeStaticMethod <@ make @> ts [| |]
+            make' ts [| |]
             |> unbox<'a MapTeqCrate> |> Some
         | _ -> None
 
@@ -127,14 +133,15 @@ type 'a DictionaryTeqCrate = abstract member Apply : DictionaryTeqEvaluator<'a, 
 module DictionaryTeqCrate =
 
     let make () =
-            { new DictionaryTeqCrate<_> with
-                member __.Apply e = e.Eval Teq.refl
-            }
+        { new DictionaryTeqCrate<_> with
+            member __.Apply e = e.Eval Teq.refl
+        }
+    let private make' = Reflection.invokeStaticMethod <@ make @>
 
     let tryMake () =
         match typeof<'a> with
         | Generic (t, ts) when t = typedefof<Dictionary<_,_>> ->
-            Reflection.invokeStaticMethod <@ make @> ts [| |]
+            make' ts [| |]
             |> unbox<'a DictionaryTeqCrate> |> Some
         | _ -> None
 
@@ -146,14 +153,15 @@ type 'a ResizeArrayTeqCrate = abstract member Apply : ResizeArrayTeqEvaluator<'a
 module ResizeArrayTeqCrate =
 
     let make () =
-            { new ResizeArrayTeqCrate<_> with
-                member __.Apply e = e.Eval Teq.refl
-            }
+        { new ResizeArrayTeqCrate<_> with
+            member __.Apply e = e.Eval Teq.refl
+        }
+    let private make' = Reflection.invokeStaticMethod <@ make @>
 
     let tryMake () =
         match typeof<'a> with
         | Generic (t, ts) when t = typedefof<_ ResizeArray> ->
-            Reflection.invokeStaticMethod <@ make @> ts [| |]
+            make' ts [| |]
             |> unbox<'a ResizeArrayTeqCrate> |> Some
         | _ -> None
 
@@ -165,14 +173,15 @@ type 'a FunTeqCrate = abstract member Apply : FunTeqEvaluator<'a, 'ret> -> 'ret
 module FunTeqCrate =
 
     let make () =
-            { new FunTeqCrate<_> with
-                member __.Apply e = e.Eval Teq.refl
-            }
+        { new FunTeqCrate<_> with
+            member __.Apply e = e.Eval Teq.refl
+        }
+    let private make' = Reflection.invokeStaticMethod <@ make @>
 
     let tryMake () =
         match typeof<'a> with
         | Fun (dom, ran) ->
-            Reflection.invokeStaticMethod <@ make @> [| dom ; ran |] [| |]
+            make' [| dom ; ran |] [| |]
             |> unbox<'a FunTeqCrate> |> Some
         | _ -> None
 
@@ -184,14 +193,15 @@ type 'a PairTeqCrate = abstract member Apply : PairTeqEvaluator<'a, 'ret> -> 're
 module PairTeqCrate =
 
     let make () =
-            { new PairTeqCrate<_> with
-                member __.Apply e = e.Eval Teq.refl
-            }
+        { new PairTeqCrate<_> with
+            member __.Apply e = e.Eval Teq.refl
+        }
+    let private make' = Reflection.invokeStaticMethod <@ make @>
 
     let tryMake () =
         match typeof<'a> with
         | Tuple ts when ts.Length = 2 ->
-            Reflection.invokeStaticMethod <@ make @> ts [| |]
+            make' ts [| |]
             |> unbox<'a PairTeqCrate> |> Some
         | _ -> None
 
@@ -203,13 +213,14 @@ type 'a TripleTeqCrate = abstract member Apply : TripleTeqEvaluator<'a, 'ret> ->
 module TripleTeqCrate =
 
     let make () =
-            { new TripleTeqCrate<_> with
-                member __.Apply e = e.Eval Teq.refl
-            }
+        { new TripleTeqCrate<_> with
+            member __.Apply e = e.Eval Teq.refl
+        }
+    let private make' = Reflection.invokeStaticMethod <@ make @>
 
     let tryMake () =
         match typeof<'a> with
         | Tuple ts when ts.Length = 3 ->
-            Reflection.invokeStaticMethod <@ make @> ts [| |]
+            make' ts [| |]
             |> unbox<'a TripleTeqCrate> |> Some
         | _ -> None
