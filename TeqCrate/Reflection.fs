@@ -7,7 +7,7 @@ open System
 [<RequireQualifiedAccess>]
 module Reflection =
 
-    let invokeStaticMethod (e : Expr) (ts : Type seq) (vs : obj seq) : obj =
+    let invokeStaticMethod (e : Expr) : Type seq -> obj seq -> obj =
 
         let rec getMethodInfo =
             function
@@ -15,8 +15,9 @@ module Reflection =
             | Lambda (_, e) -> getMethodInfo e
             | _ -> failwith "Could not get MethodInfo"
 
-        e
-        |> getMethodInfo
-        |> fun mi -> mi.GetGenericMethodDefinition ()
-        |> fun mi -> mi.MakeGenericMethod (ts |> Array.ofSeq)
-        |> fun mi -> mi.Invoke(null, vs |> Array.ofSeq)
+        let mi =
+            (getMethodInfo e).GetGenericMethodDefinition ()
+
+        fun ts vs ->
+            mi.MakeGenericMethod (ts |> Array.ofSeq)
+            |> fun mi -> mi.Invoke(null, vs |> Array.ofSeq)

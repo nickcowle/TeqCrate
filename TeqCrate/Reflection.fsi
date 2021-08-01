@@ -12,4 +12,4 @@ module Reflection =
     /// as the generic type parameters and the supplied sequence of objects as
     /// the paramters to the method.
     /// Returns the boxed return value of the method.
-    val invokeStaticMethod : Expr -> Type seq -> obj seq -> obj
+    val invokeStaticMethod : e : Expr -> (Type seq -> obj seq -> obj)
