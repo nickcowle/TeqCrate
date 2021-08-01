@@ -248,3 +248,75 @@ module TestPatterns =
                 false
 
         Assert.True result
+
+    type private TestPrivateRecord =
+        {
+            PrivateFoo : string
+            PrivateBar : int
+            PrivateBaz : string
+        }
+
+    [<Fact>]
+    let ``Record active pattern recognises a private record`` () =
+
+        let r = { PrivateFoo = "hello"; PrivateBar = 1234 ; PrivateBaz = "world" }
+        let pairs = tryGetStringKeyValues r |> Option.map (Map.toSeq >> Seq.sort >> List.ofSeq)
+        let expected = Some [ "PrivateBaz", "world" ; "PrivateFoo", "hello" ]
+
+        Assert.Equal(expected, pairs)
+
+        let result =
+            match tType<TestPrivateRecord> with
+            | Record c ->
+                c.Apply
+                    { new RecordConvEvaluator<_,_> with
+                        member __.Eval<'a> names ts (conv : Conv<TestPrivateRecord, 'a HList>) =
+
+                            let expectedNames = [ "PrivateFoo" ; "PrivateBar" ; "PrivateBaz" ]
+                            Assert.Equal<string list>(expectedNames, names)
+
+                            TypeList.toTypes ts = [ typeof<string> ; typeof<int> ; typeof<string> ]
+                    }
+            | _ ->
+                false
+
+        Assert.True result
+
+    type TestInternallyPrivateRecord =
+        private
+            {
+                InternallyPrivateFoo : string
+                InternallyPrivateBar : int
+                InternallyPrivateBaz : string
+            }
+
+    [<Fact>]
+    let ``Record active pattern recognises a public record whose fields are private`` () =
+
+        let r = { InternallyPrivateFoo = "hello"; InternallyPrivateBar = 1234 ; InternallyPrivateBaz = "world" }
+        let pairs = tryGetStringKeyValues r |> Option.map (Map.toSeq >> Seq.sort >> List.ofSeq)
+        let expected = Some [ "InternallyPrivateBaz", "world" ; "InternallyPrivateFoo", "hello" ]
+
+        Assert.Equal(expected, pairs)
+
+        let result =
+            match tType<TestInternallyPrivateRecord> with
+            | Record c ->
+                c.Apply
+                    { new RecordConvEvaluator<_,_> with
+                        member __.Eval<'a> names ts (conv : Conv<TestInternallyPrivateRecord, 'a HList>) =
+
+                            let expectedNames =
+                                [
+                                    "InternallyPrivateFoo"
+                                    "InternallyPrivateBar"
+                                    "InternallyPrivateBaz"
+                                ]
+                            Assert.Equal<string list>(expectedNames, names)
+
+                            TypeList.toTypes ts = [ typeof<string> ; typeof<int> ; typeof<string> ]
+                    }
+            | _ ->
+                false
+
+        Assert.True result
