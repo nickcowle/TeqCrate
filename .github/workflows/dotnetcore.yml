@@ -30,3 +30,7 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-restore --verbosity normal
+    - name: Prepare .NET tools
+      run: dotnet tool restore
+    - name: Run Fantomas
+      run: dotnet tool run fantomas --check -r .
