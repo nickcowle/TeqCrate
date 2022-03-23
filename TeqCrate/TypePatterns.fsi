@@ -7,19 +7,19 @@ open System
 module TypePatterns =
 
     /// Recognises types that represent a generic type with generic type parameters.
-    val (|Generic|_|) : Type -> (Type * Type list) option
+    val (|Generic|_|): Type -> (Type * Type list) option
 
     /// Recognises types that represent an Array type.
-    val (|Array|_|) : Type -> Type option
+    val (|Array|_|): Type -> Type option
 
     /// Recognises types that represent a Tuple type.
-    val (|Tuple|_|) : Type -> Type list option
+    val (|Tuple|_|): Type -> Type list option
 
     /// Recognises types that represent a Function type.
-    val (|Fun|_|) : Type -> (Type * Type) option
+    val (|Fun|_|): Type -> (Type * Type) option
 
     /// Recognises types that represent an F# record type.
-    val (|Record|_|) : Type -> (string * Type) list option
+    val (|Record|_|): Type -> (string * Type) list option
 
     /// Recognises types that represent an F# discriminated union type.
-    val (|Union|_|) : Type -> UnionCaseInfo list option
+    val (|Union|_|): Type -> UnionCaseInfo list option

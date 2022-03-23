@@ -7,4 +7,4 @@ open System
 module Type =
 
     /// Pretty-printer for runtime Types.
-    val print : Type -> string
+    val print: Type -> string

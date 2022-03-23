@@ -5,11 +5,7 @@
 /// - one mapping from 'a -> 'b and the other mapping from 'b -> 'a.
 [<NoComparison>]
 [<NoEquality>]
-type Conv<'a, 'b> =
-    {
-        To : 'a -> 'b
-        From : 'b -> 'a
-    }
+type Conv<'a, 'b> = { To: 'a -> 'b; From: 'b -> 'a }
 
 /// The Conv type (short for converter) is essentially a bi-directional map between two types.
 /// For any pair of types 'a and 'b, a Conv<'a, 'b> is a pair of functions
@@ -18,8 +14,8 @@ type Conv<'a, 'b> =
 module Conv =
 
     /// Takes a pair of mapping functions and returns a converter of the corresponding type
-    val make : ('a -> 'b) -> ('b -> 'a) -> Conv<'a, 'b>
+    val make: ('a -> 'b) -> ('b -> 'a) -> Conv<'a, 'b>
 
     /// Given two converters, which convert between 'a <-> 'b and 'b <-> 'c respectively,
     /// creates the composite converter which converts between 'a <-> 'c
-    val compose : Conv<'a, 'b> -> Conv<'b, 'c> -> Conv<'a, 'c>
+    val compose: Conv<'a, 'b> -> Conv<'b, 'c> -> Conv<'a, 'c>

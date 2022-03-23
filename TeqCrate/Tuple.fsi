@@ -10,4 +10,4 @@ module Tuple =
     /// the type of the object is a tuple type. If it is, the elements of the
     /// tuple are then folded over by the HListFolder, returning the final state.
     /// Otherwise, returns None.
-    val tryFoldTuple : 'state HListFolder -> 'state -> 'tuple -> 'state option
+    val tryFoldTuple: 'state HListFolder -> 'state -> 'tuple -> 'state option

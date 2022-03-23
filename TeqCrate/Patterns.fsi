@@ -16,74 +16,74 @@ module Patterns =
     val tType<'a> : 'a TType
 
     /// Recognises tTypes that represent the bool type.
-    val (|Bool|_|) : 'a TType -> Teq<'a, bool> option
+    val (|Bool|_|): 'a TType -> Teq<'a, bool> option
 
     /// Recognises tTypes that represent the int type.
-    val (|Int|_|) : 'a TType -> Teq<'a, int> option
+    val (|Int|_|): 'a TType -> Teq<'a, int> option
 
     /// Recognises tTypes that represent the int64 type.
-    val (|Int64|_|) : 'a TType -> Teq<'a, int64> option
+    val (|Int64|_|): 'a TType -> Teq<'a, int64> option
 
     /// Recognises tTypes that represent the float type.
-    val (|Float|_|) : 'a TType -> Teq<'a, float> option
+    val (|Float|_|): 'a TType -> Teq<'a, float> option
 
     /// Recognises tTypes that represent the string type.
-    val (|String|_|) : 'a TType -> Teq<'a, string> option
+    val (|String|_|): 'a TType -> Teq<'a, string> option
 
     /// Recognises tTypes that represent the unit type.
-    val (|Unit|_|) : 'a TType -> Teq<'a, unit> option
+    val (|Unit|_|): 'a TType -> Teq<'a, unit> option
 
     /// Recognises tTypes that represent the DateTime type.
-    val (|DateTime|_|) : 'a TType -> Teq<'a, DateTime> option
+    val (|DateTime|_|): 'a TType -> Teq<'a, DateTime> option
 
     /// Recognises tTypes that represent the TimeSpan type.
-    val (|TimeSpan|_|) : 'a TType -> Teq<'a, TimeSpan> option
+    val (|TimeSpan|_|): 'a TType -> Teq<'a, TimeSpan> option
 
     /// Recognises tTypes that match the second given tType.
-    val (|Teq|_|) : 'b TType -> 'a TType -> Teq<'a, 'b> option
+    val (|Teq|_|): 'b TType -> 'a TType -> Teq<'a, 'b> option
 
     /// Recognises tTypes that represent an Array type.
-    val (|Array|_|) : 'a TType -> 'a ArrayTeqCrate option
+    val (|Array|_|): 'a TType -> 'a ArrayTeqCrate option
 
     /// Recognises tTypes that represent a list type.
-    val (|List|_|) : 'a TType -> 'a ListTeqCrate option
+    val (|List|_|): 'a TType -> 'a ListTeqCrate option
 
     /// Recognises tTypes that represent a seq type.
-    val (|Seq|_|) : 'a TType -> 'a SeqTeqCrate option
+    val (|Seq|_|): 'a TType -> 'a SeqTeqCrate option
 
     /// Recognises tTypes that represent an option type.
-    val (|Option|_|) : 'a TType -> 'a OptionTeqCrate option
+    val (|Option|_|): 'a TType -> 'a OptionTeqCrate option
 
     /// Recognises tTypes that represent a Set type.
-    val (|Set|_|) : 'a TType -> 'a SetTeqCrate option
+    val (|Set|_|): 'a TType -> 'a SetTeqCrate option
 
     /// Recognises tTypes that represent a Map type.
-    val (|Map|_|) : 'a TType -> 'a MapTeqCrate option
+    val (|Map|_|): 'a TType -> 'a MapTeqCrate option
 
     /// Recognises tTypes that represent a Dictionary type.
-    val (|Dictionary|_|) : 'a TType -> 'a DictionaryTeqCrate option
+    val (|Dictionary|_|): 'a TType -> 'a DictionaryTeqCrate option
 
     /// Recognises tTypes that represent a ResizeArray type.
-    val (|ResizeArray|_|) : 'a TType -> 'a ResizeArrayTeqCrate option
+    val (|ResizeArray|_|): 'a TType -> 'a ResizeArrayTeqCrate option
 
     /// Recognises tTypes that represent a function type.
-    val (|Fun|_|) : 'a TType -> 'a FunTeqCrate option
+    val (|Fun|_|): 'a TType -> 'a FunTeqCrate option
 
     /// Recognises tTypes that represent a pair type.
-    val (|Pair|_|) : 'a TType -> 'a PairTeqCrate option
+    val (|Pair|_|): 'a TType -> 'a PairTeqCrate option
 
     /// Recognises tTypes that represent a triple type.
-    val (|Triple|_|) : 'a TType -> 'a TripleTeqCrate option
+    val (|Triple|_|): 'a TType -> 'a TripleTeqCrate option
 
     /// Recognises tTypes that represent a tuple type.
-    val (|Tuple|_|) : 'a TType -> 'a TupleConvCrate option
+    val (|Tuple|_|): 'a TType -> 'a TupleConvCrate option
 
     /// Recognises tTypes that represent an F# record type.
-    val (|Record|_|) : 'a TType -> 'a RecordConvCrate option
+    val (|Record|_|): 'a TType -> 'a RecordConvCrate option
 
     /// Recognises tTypes that represent an F# discriminated union type.
-    val (|Union|_|) : 'a TType -> 'a UnionConvCrate option
+    val (|Union|_|): 'a TType -> 'a UnionConvCrate option
 
     /// Recognises tTypes that represent an F# discriminated union type,
     /// returning a converter to decompose it into a SumOfProducts type.
-    val (|SumOfProducts|_|) : 'a TType -> 'a SumOfProductsConvCrate option
+    val (|SumOfProducts|_|): 'a TType -> 'a SumOfProductsConvCrate option
