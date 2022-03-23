@@ -16,3 +16,9 @@ Before your first push (but only once), you will need to install the [.NET local
 ```bash
 dotnet tool restore
 ```
+
+Some commits (such as big-bang formatting commits) are recorded for convenience in `.git-blame-ignore-revs`.
+Consider performing the following command to have `git blame` ignore these commits:
+```bash
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+```
