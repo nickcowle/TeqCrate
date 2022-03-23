@@ -2,8 +2,11 @@
 
 open System
 
-type TypeParameterEvaluator<'ret> = abstract member Eval<'a> : unit -> 'ret
-type TypeParameterCrate = abstract member Apply : TypeParameterEvaluator<'ret> -> 'ret
+type TypeParameterEvaluator<'ret> =
+    abstract member Eval<'a> : unit -> 'ret
+
+type TypeParameterCrate =
+    abstract member Apply : TypeParameterEvaluator<'ret> -> 'ret
 
 [<RequireQualifiedAccess>]
 module TypeParameterCrate =
@@ -14,7 +17,7 @@ module TypeParameterCrate =
         }
 
     let makeUntyped (t : Type) =
-        Reflection.invokeStaticMethod <@ make @> [| t |] [| |]
+        Reflection.invokeStaticMethod <@ make @> [| t |] [||]
         |> unbox<TypeParameterCrate>
 
     let toType (crate : TypeParameterCrate) =

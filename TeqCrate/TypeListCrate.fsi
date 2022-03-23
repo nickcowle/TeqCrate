@@ -4,12 +4,14 @@ open HCollections
 open System
 
 /// A universally quantified function that takes a TypeList and returns a value of type 'ret
-type TypeListEvaluator<'ret> = abstract member Eval : 'ts TypeList -> 'ret
+type TypeListEvaluator<'ret> =
+    abstract member Eval : 'ts TypeList -> 'ret
 
 /// An encoding of an existentially quantified TypeList.
 /// Given a TypeListEvaluator, it will invoke it with the TypeList
 /// that it holds and will return the result.
-type TypeListCrate = abstract member Apply : TypeListEvaluator<'ret> -> 'ret
+type TypeListCrate =
+    abstract member Apply : TypeListEvaluator<'ret> -> 'ret
 
 /// An encoding of an existentially quantified TypeList.
 /// Given a TypeListEvaluator, it will invoke it with the TypeList

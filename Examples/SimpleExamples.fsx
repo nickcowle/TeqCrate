@@ -31,14 +31,14 @@ let tryListLength (a : 'a) : int option =
     match tType<'a> with
     | List crate ->
         crate.Apply
-            { new ListTeqEvaluator<_,_> with
+            { new ListTeqEvaluator<_, _> with
                 member __.Eval (teq : Teq<'a, 'b list>) =
                     a |> Teq.castTo teq |> List.length |> Some
             }
     | _ -> None
 
 tryListLength "hello"
-tryListLength ['a'..'z']
+tryListLength [ 'a' .. 'z' ]
 
 
 
@@ -48,23 +48,33 @@ let tryListSomeCount (a : 'a) : int option =
     match tType<'a> with
     | List crate ->
         crate.Apply
-            { new ListTeqEvaluator<_,_> with
+            { new ListTeqEvaluator<_, _> with
                 member __.Eval (teq1 : Teq<'a, 'b list>) =
                     match tType<'b> with
                     | Option crate ->
                         crate.Apply
-                            { new OptionTeqEvaluator<_,_> with
+                            { new OptionTeqEvaluator<_, _> with
                                 member __.Eval (teq2 : Teq<'b, 'c option>) =
-                                    let teq : Teq<'a, 'c option list> =
-                                        Teq.transitivity teq1 (Teq.Cong.list teq2)
+                                    let teq : Teq<'a, 'c option list> = Teq.transitivity teq1 (Teq.Cong.list teq2)
                                     let xs : 'c option list = Teq.castTo teq a
-                                    xs |> List.filter Option.isSome |> List.length |> Some
+
+                                    xs
+                                    |> List.filter Option.isSome
+                                    |> List.length
+                                    |> Some
                             }
                     | _ -> None
             }
     | _ -> None
 
-tryListSomeCount [ None ; Some 'a' ; None ; Some 'b' ; Some 'c' ]
+tryListSomeCount
+    [
+        None
+        Some 'a'
+        None
+        Some 'b'
+        Some 'c'
+    ]
 
 
 
@@ -74,9 +84,8 @@ let tryTupleLength (a : 'a) : int option =
     match tType<'a> with
     | Tuple crate ->
         crate.Apply
-            { new TupleConvEvaluator<_,_> with
-                member __.Eval (ts : 'ts TypeList) (conv : Conv<'a, 'ts HList>) =
-                    a |> conv.To |> HList.length |> Some
+            { new TupleConvEvaluator<_, _> with
+                member __.Eval (ts : 'ts TypeList) (conv : Conv<'a, 'ts HList>) = a |> conv.To |> HList.length |> Some
             }
     | _ -> None
 
@@ -91,9 +100,10 @@ let trySumTupleInts (a : 'a) : int option =
     match tType<'a> with
     | Tuple crate ->
         crate.Apply
-            { new TupleConvEvaluator<_,_> with
+            { new TupleConvEvaluator<_, _> with
                 member __.Eval _ (conv : Conv<'a, 'ts HList>) =
                     let xs : 'ts HList = a |> conv.To
+
                     let folder =
                         { new HListFolder<int> with
                             member __.Folder sum (x : 'b) =
@@ -101,6 +111,7 @@ let trySumTupleInts (a : 'a) : int option =
                                 | Int teq -> sum + (x |> Teq.castTo teq)
                                 | _ -> sum
                         }
+
                     HList.fold folder 0 xs |> Some
             }
     | _ -> None
@@ -116,23 +127,30 @@ let rec shoutify<'ts> (xs : 'ts HList) : 'ts HList =
     match xs |> HList.toTypeList |> TypeList.split with
     | Choice1Of2 _ -> xs
     | Choice2Of2 crate ->
-        crate.Apply
-            { new TypeListConsEvaluator<_,_> with
-                member __.Eval _ (teq : Teq<'ts, 'u -> 'us>) =
-                    let xs : ('u -> 'us) HList = xs |> Teq.castTo (HList.cong teq)
-                    let head =
-                        match tType<'u> with
-                        | String teq -> (xs |> HList.head |> Teq.castTo teq).ToUpper () |> Teq.castFrom teq
-                        | _ -> xs |> HList.head
-                    let tail = xs |> HList.tail |> shoutify
-                    HList.cons head tail |> Teq.castFrom (HList.cong teq)
-            }
+
+    crate.Apply
+        { new TypeListConsEvaluator<_, _> with
+            member __.Eval _ (teq : Teq<'ts, 'u -> 'us>) =
+                let xs : ('u -> 'us) HList = xs |> Teq.castTo (HList.cong teq)
+
+                let head =
+                    match tType<'u> with
+                    | String teq ->
+                        (xs |> HList.head |> Teq.castTo teq).ToUpper ()
+                        |> Teq.castFrom teq
+                    | _ -> xs |> HList.head
+
+                let tail = xs |> HList.tail |> shoutify
+
+                HList.cons head tail
+                |> Teq.castFrom (HList.cong teq)
+        }
 
 let tryShoutifyRecord (a : 'a) : 'a option =
     match tType<'a> with
     | Record crate ->
         crate.Apply
-            { new RecordConvEvaluator<_,_> with
+            { new RecordConvEvaluator<_, _> with
                 member __.Eval _ _ (conv : Conv<'a, 'ts HList>) =
                     let xs : 'ts HList = a |> conv.To
                     shoutify xs |> conv.From |> Some
@@ -147,6 +165,12 @@ type MyRecord =
         Location : string
     }
 
-let sample = { FirstName = "Bob" ; LastName = "Sample" ; Age = 35 ; Location = "London" }
+let sample =
+    {
+        FirstName = "Bob"
+        LastName = "Sample"
+        Age = 35
+        Location = "London"
+    }
 
 tryShoutifyRecord sample

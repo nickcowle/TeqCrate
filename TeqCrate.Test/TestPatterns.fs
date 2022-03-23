@@ -16,16 +16,14 @@ module TestPatterns =
         let t2 = tType<string>
 
         match t1 with
-        | Teq t2 teq ->
-            Assert.True false
-        | _ ->
-            Assert.True true
+        | Teq t2 teq -> Assert.True false
+        | _ -> Assert.True true
 
     let tryGetArrayLength (arr : 'a) : int option =
         match tType<'a> with
         | Array c ->
             c.Apply
-                { new ArrayTeqEvaluator<_,_> with
+                { new ArrayTeqEvaluator<_, _> with
                     member __.Eval teq = (Teq.castTo teq arr).Length |> Some
                 }
         | _ -> None
@@ -40,8 +38,9 @@ module TestPatterns =
         match tType<'a> with
         | List c ->
             c.Apply
-                { new ListTeqEvaluator<_,_> with
-                    member __.Eval teq = xs |> Teq.castTo teq |> List.length |> Some
+                { new ListTeqEvaluator<_, _> with
+                    member __.Eval teq =
+                        xs |> Teq.castTo teq |> List.length |> Some
                 }
         | _ -> None
 
@@ -55,8 +54,9 @@ module TestPatterns =
         match tType<'a> with
         | Map c ->
             c.Apply
-                { new MapTeqEvaluator<_,_> with
-                    member __.Eval teq = map |> Teq.castTo teq |> Map.count |> Some
+                { new MapTeqEvaluator<_, _> with
+                    member __.Eval teq =
+                        map |> Teq.castTo teq |> Map.count |> Some
                 }
         | _ -> None
 
@@ -80,13 +80,12 @@ module TestPatterns =
         | Fun c ->
             let dom, ran =
                 c.Apply
-                    { new FunTeqEvaluator<_,_> with
-                        member __.Eval (teq : Teq<int -> string, 'a -> 'b>) =
-                            typeof<'a>, typeof<'b>
+                    { new FunTeqEvaluator<_, _> with
+                        member __.Eval (teq : Teq<int -> string, 'a -> 'b>) = typeof<'a>, typeof<'b>
                     }
 
-            Assert.Equal(typeof<int>, dom)
-            Assert.Equal(typeof<string>, ran)
+            Assert.Equal (typeof<int>, dom)
+            Assert.Equal (typeof<string>, ran)
 
         | _ -> Assert.True false
 
@@ -97,13 +96,12 @@ module TestPatterns =
         | Pair c ->
             let t1, t2 =
                 c.Apply
-                    { new PairTeqEvaluator<_,_> with
-                        member __.Eval (teq : Teq<int * string, 'a * 'b>) =
-                            typeof<'a>, typeof<'b>
+                    { new PairTeqEvaluator<_, _> with
+                        member __.Eval (teq : Teq<int * string, 'a * 'b>) = typeof<'a>, typeof<'b>
                     }
 
-            Assert.Equal(typeof<int>, t1)
-            Assert.Equal(typeof<string>, t2)
+            Assert.Equal (typeof<int>, t1)
+            Assert.Equal (typeof<string>, t2)
 
         | _ -> Assert.True false
 
@@ -113,8 +111,7 @@ module TestPatterns =
         // in the presence of unit. (It turns out that units are just fine here.)
 
         match tType<unit> with
-        | Unit teq ->
-            Assert.True (Teq.castFrom teq () = ())
+        | Unit teq -> Assert.True (Teq.castFrom teq () = ())
 
         | _ -> Assert.True false
 
@@ -125,14 +122,14 @@ module TestPatterns =
         | Triple c ->
             let t1, t2, t3 =
                 c.Apply
-                    { new TripleTeqEvaluator<_,_> with
+                    { new TripleTeqEvaluator<_, _> with
                         member __.Eval (teq : Teq<int * string * bool, 'a * 'b * 'c>) =
                             typeof<'a>, typeof<'b>, typeof<'c>
                     }
 
-            Assert.Equal(typeof<int>, t1)
-            Assert.Equal(typeof<string>, t2)
-            Assert.Equal(typeof<bool>, t3)
+            Assert.Equal (typeof<int>, t1)
+            Assert.Equal (typeof<string>, t2)
+            Assert.Equal (typeof<bool>, t3)
 
         | _ -> Assert.True false
 
@@ -147,7 +144,7 @@ module TestPatterns =
         match tType<'a> with
         | Record c ->
             c.Apply
-                { new RecordConvEvaluator<_,_> with
+                { new RecordConvEvaluator<_, _> with
                     member __.Eval names _ conv =
 
                         let folder =
@@ -156,28 +153,42 @@ module TestPatterns =
                                     match value with
                                     | Some v -> Map.add (names |> List.head) v map
                                     | None -> map
+
                                 names |> List.tail, map
+
                             HListFolder.makeGappedElementFolder f
 
-                        record |> conv.To |> HList.fold folder (names, Map.empty) |> snd
+                        record
+                        |> conv.To
+                        |> HList.fold folder (names, Map.empty)
+                        |> snd
                 }
-                |> Some
+            |> Some
         | _ -> None
 
     [<Fact>]
     let ``Record active pattern recognises a record`` () =
 
-        let r = { Foo = "hello"; Bar = 1234 ; Baz = "world" }
-        let pairs = tryGetStringKeyValues r |> Option.map (Map.toSeq >> Seq.sort >> List.ofSeq)
+        let r =
+            {
+                Foo = "hello"
+                Bar = 1234
+                Baz = "world"
+            }
+
+        let pairs =
+            tryGetStringKeyValues r
+            |> Option.map (Map.toSeq >> Seq.sort >> List.ofSeq)
+
         let expected = Some [ "Baz", "world" ; "Foo", "hello" ]
 
-        Assert.Equal(expected, pairs)
+        Assert.Equal (expected, pairs)
 
     type TestUnion =
-    | Foo
-    | Bar of int * string * bool
-    | Baz of string * float
-    | Quux of string
+        | Foo
+        | Bar of int * string * bool
+        | Baz of string * float
+        | Quux of string
 
     [<Fact>]
     let ``Union active pattern recognises a union`` () =
@@ -188,16 +199,19 @@ module TestPatterns =
             match tType<TestUnion> with
             | Union c ->
                 c.Apply
-                    { new UnionConvEvaluator<_,_> with
+                    { new UnionConvEvaluator<_, _> with
                         member __.Eval names ts (conv : Conv<TestUnion, 'a HUnion>) =
 
                             let expectedNames = [ "Foo" ; "Bar" ; "Baz" ; "Quux" ]
-                            Assert.Equal<string list>(expectedNames, names)
+                            Assert.Equal<string list> (expectedNames, names)
 
-                            let expectedUnionType = tType<(unit -> (int * string * bool) -> (string * float) -> string -> unit) HUnion>
+                            let expectedUnionType =
+                                tType<(unit -> (int * string * bool) -> (string * float) -> string -> unit) HUnion>
+
                             match tType<'a HUnion> with
                             | Teq expectedUnionType teq ->
                                 let converted = testValue |> conv.To |> Teq.castTo teq
+
                                 match HUnion.split converted with
                                 | Choice1Of2 v -> false
                                 | Choice2Of2 union ->
@@ -206,11 +220,9 @@ module TestPatterns =
                                         let convertedBack = converted |> Teq.castFrom teq |> conv.From
                                         true
                                     | Choice2Of2 _ -> false
-                            | _ ->
-                                false
+                            | _ -> false
                     }
-            | _ ->
-                false
+            | _ -> false
 
         Assert.True result
 
@@ -223,16 +235,19 @@ module TestPatterns =
             match tType<TestUnion> with
             | SumOfProducts c ->
                 c.Apply
-                    { new SumOfProductsConvEvaluator<_,_> with
+                    { new SumOfProductsConvEvaluator<_, _> with
                         member __.Eval names ts (conv : Conv<TestUnion, 'a SumOfProducts>) =
 
                             let expectedNames = [ "Foo" ; "Bar" ; "Baz" ; "Quux" ]
-                            Assert.Equal<string list>(expectedNames, names)
+                            Assert.Equal<string list> (expectedNames, names)
 
-                            let expectedUnionType = tType<(unit -> (int -> string -> bool -> unit) -> (string -> float -> unit) -> (string -> unit) -> unit) SumOfProducts>
+                            let expectedUnionType =
+                                tType<(unit -> (int -> string -> bool -> unit) -> (string -> float -> unit) -> (string -> unit) -> unit) SumOfProducts>
+
                             match tType<'a SumOfProducts> with
                             | Teq expectedUnionType teq ->
                                 let converted = testValue |> conv.To |> Teq.castTo teq
+
                                 match SumOfProducts.split converted with
                                 | Choice1Of2 v -> false
                                 | Choice2Of2 sop ->
@@ -241,11 +256,9 @@ module TestPatterns =
                                         let convertedBack = converted |> Teq.castFrom teq |> conv.From
                                         true
                                     | Choice2Of2 _ -> false
-                            | _ ->
-                                false
+                            | _ -> false
                     }
-            | _ ->
-                false
+            | _ -> false
 
         Assert.True result
 
@@ -259,26 +272,49 @@ module TestPatterns =
     [<Fact>]
     let ``Record active pattern recognises a private record`` () =
 
-        let r = { PrivateFoo = "hello"; PrivateBar = 1234 ; PrivateBaz = "world" }
-        let pairs = tryGetStringKeyValues r |> Option.map (Map.toSeq >> Seq.sort >> List.ofSeq)
-        let expected = Some [ "PrivateBaz", "world" ; "PrivateFoo", "hello" ]
+        let r =
+            {
+                PrivateFoo = "hello"
+                PrivateBar = 1234
+                PrivateBaz = "world"
+            }
 
-        Assert.Equal(expected, pairs)
+        let pairs =
+            tryGetStringKeyValues r
+            |> Option.map (Map.toSeq >> Seq.sort >> List.ofSeq)
+
+        let expected =
+            Some
+                [
+                    "PrivateBaz", "world"
+                    "PrivateFoo", "hello"
+                ]
+
+        Assert.Equal (expected, pairs)
 
         let result =
             match tType<TestPrivateRecord> with
             | Record c ->
                 c.Apply
-                    { new RecordConvEvaluator<_,_> with
+                    { new RecordConvEvaluator<_, _> with
                         member __.Eval<'a> names ts (conv : Conv<TestPrivateRecord, 'a HList>) =
 
-                            let expectedNames = [ "PrivateFoo" ; "PrivateBar" ; "PrivateBaz" ]
-                            Assert.Equal<string list>(expectedNames, names)
+                            let expectedNames =
+                                [
+                                    "PrivateFoo"
+                                    "PrivateBar"
+                                    "PrivateBaz"
+                                ]
 
-                            TypeList.toTypes ts = [ typeof<string> ; typeof<int> ; typeof<string> ]
+                            Assert.Equal<string list> (expectedNames, names)
+
+                            TypeList.toTypes ts = [
+                                typeof<string>
+                                typeof<int>
+                                typeof<string>
+                            ]
                     }
-            | _ ->
-                false
+            | _ -> false
 
         Assert.True result
 
@@ -293,17 +329,31 @@ module TestPatterns =
     [<Fact>]
     let ``Record active pattern recognises a public record whose fields are private`` () =
 
-        let r = { InternallyPrivateFoo = "hello"; InternallyPrivateBar = 1234 ; InternallyPrivateBaz = "world" }
-        let pairs = tryGetStringKeyValues r |> Option.map (Map.toSeq >> Seq.sort >> List.ofSeq)
-        let expected = Some [ "InternallyPrivateBaz", "world" ; "InternallyPrivateFoo", "hello" ]
+        let r =
+            {
+                InternallyPrivateFoo = "hello"
+                InternallyPrivateBar = 1234
+                InternallyPrivateBaz = "world"
+            }
 
-        Assert.Equal(expected, pairs)
+        let pairs =
+            tryGetStringKeyValues r
+            |> Option.map (Map.toSeq >> Seq.sort >> List.ofSeq)
+
+        let expected =
+            Some
+                [
+                    "InternallyPrivateBaz", "world"
+                    "InternallyPrivateFoo", "hello"
+                ]
+
+        Assert.Equal (expected, pairs)
 
         let result =
             match tType<TestInternallyPrivateRecord> with
             | Record c ->
                 c.Apply
-                    { new RecordConvEvaluator<_,_> with
+                    { new RecordConvEvaluator<_, _> with
                         member __.Eval<'a> names ts (conv : Conv<TestInternallyPrivateRecord, 'a HList>) =
 
                             let expectedNames =
@@ -312,11 +362,15 @@ module TestPatterns =
                                     "InternallyPrivateBar"
                                     "InternallyPrivateBaz"
                                 ]
-                            Assert.Equal<string list>(expectedNames, names)
 
-                            TypeList.toTypes ts = [ typeof<string> ; typeof<int> ; typeof<string> ]
+                            Assert.Equal<string list> (expectedNames, names)
+
+                            TypeList.toTypes ts = [
+                                typeof<string>
+                                typeof<int>
+                                typeof<string>
+                            ]
                     }
-            | _ ->
-                false
+            | _ -> false
 
         Assert.True result

@@ -26,5 +26,4 @@ module TestType =
 
     [<Theory>]
     [<MemberData("testCases")>]
-    let ``Test print`` (t : Type, expected : string) : unit =
-        Assert.Equal(expected, Type.print t)
+    let ``Test print`` (t : Type, expected : string) : unit = Assert.Equal (expected, Type.print t)
