@@ -158,6 +158,8 @@ module TestPatterns =
 
                             HListFolder.makeGappedElementFolder f
 
+                        let names = names |> List.map TypeField.name
+
                         record
                         |> conv.To
                         |> HList.fold folder (names, Map.empty)
@@ -203,7 +205,8 @@ module TestPatterns =
                         member __.Eval names ts (conv : Conv<TestUnion, 'a HUnion>) =
 
                             let expectedNames = [ "Foo" ; "Bar" ; "Baz" ; "Quux" ]
-                            Assert.Equal<string list> (expectedNames, names)
+                            let actualNames = names |> List.map TypeField.name
+                            Assert.Equal<string list> (expectedNames, actualNames)
 
                             let expectedUnionType =
                                 tType<(unit -> (int * string * bool) -> (string * float) -> string -> unit) HUnion>
@@ -306,7 +309,9 @@ module TestPatterns =
                                     "PrivateBaz"
                                 ]
 
-                            Assert.Equal<string list> (expectedNames, names)
+                            let actualNames = names |> List.map TypeField.name
+
+                            Assert.Equal<string list> (expectedNames, actualNames)
 
                             TypeList.toTypes ts = [
                                 typeof<string>
@@ -363,7 +368,9 @@ module TestPatterns =
                                     "InternallyPrivateBaz"
                                 ]
 
-                            Assert.Equal<string list> (expectedNames, names)
+                            let actualNames = names |> List.map TypeField.name
+
+                            Assert.Equal<string list> (expectedNames, actualNames)
 
                             TypeList.toTypes ts = [
                                 typeof<string>
