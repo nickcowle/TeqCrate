@@ -5,7 +5,6 @@ import subprocess
 def check_fantomas():
     result = subprocess.run(["dotnet", "tool", "run", "fantomas", "--check", "-r", "."])
     if result.returncode != 0:
-        print(result.stdout)
         raise Exception(f"Formatting incomplete (return code: {result.returncode}). Consider running `dotnet tool run fantomas -r .`")
 
 
