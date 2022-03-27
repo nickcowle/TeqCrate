@@ -38,7 +38,7 @@ module TestRecord =
 
         let fields =
             { new RecordConvEvaluator<_, _> with
-                member _.Eval (fields : TypeField list) _ _ = fields
+                member _.Eval (fields : RecordTypeField list) _ _ = fields
             }
             |> data.Apply
 

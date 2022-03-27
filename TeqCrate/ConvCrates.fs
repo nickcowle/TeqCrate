@@ -73,7 +73,7 @@ module TupleConvCrate =
         | _ -> None
 
 type RecordConvEvaluator<'record, 'ret> =
-    abstract member Eval : TypeField list -> 'ts TypeList -> Conv<'record, 'ts HList> -> 'ret
+    abstract member Eval : RecordTypeField list -> 'ts TypeList -> Conv<'record, 'ts HList> -> 'ret
 
 type 'record RecordConvCrate =
     abstract member Apply : RecordConvEvaluator<'record, 'ret> -> 'ret
@@ -85,7 +85,12 @@ module RecordConvCrate =
             member __.Apply e = e.Eval names tl conv
         }
 
-    let rec makeUntyped<'ts> (fields : TypeField list) (tl : 'ts TypeList) (ts : Type list) : obj list RecordConvCrate =
+    let rec makeUntyped<'ts>
+        (fields : RecordTypeField list)
+        (tl : 'ts TypeList)
+        (ts : Type list)
+        : obj list RecordConvCrate
+        =
         match ts with
         | [] ->
             let toF _ = HList.empty
@@ -100,7 +105,7 @@ module RecordConvCrate =
                 }
 
     and makeUntypedInner<'t, 'ts>
-        (fields : TypeField list)
+        (fields : RecordTypeField list)
         (tl : 'ts TypeList)
         (ts : Type list)
         : obj list RecordConvCrate
@@ -149,7 +154,7 @@ module RecordConvCrate =
 
 
 type UnionConvEvaluator<'union, 'ret> =
-    abstract member Eval : TypeField list -> 'ts TypeList -> Conv<'union, 'ts HUnion> -> 'ret
+    abstract member Eval : UnionTypeField list -> 'ts TypeList -> Conv<'union, 'ts HUnion> -> 'ret
 
 type 'union UnionConvCrate =
     abstract member Apply : UnionConvEvaluator<'union, 'ret> -> 'ret
@@ -161,7 +166,7 @@ module UnionConvCrate =
             member __.Apply e = e.Eval names ts conv
         }
 
-    let rec makeUntyped (names : TypeField list) (ts : Type list) : (int * obj) UnionConvCrate =
+    let rec makeUntyped (names : UnionTypeField list) (ts : Type list) : (int * obj) UnionConvCrate =
         match ts with
         | [] -> failwith "Cannot create UnionConvCrate - the list of union cases must not be empty"
         | t :: ts ->
@@ -173,7 +178,7 @@ module UnionConvCrate =
                 member __.Eval<'t> () = makeUntypedInner<'t> names ts
             }
 
-    and makeUntypedInner<'t> (names : TypeField list) (ts : Type list) : (int * obj) UnionConvCrate =
+    and makeUntypedInner<'t> (names : UnionTypeField list) (ts : Type list) : (int * obj) UnionConvCrate =
         match ts with
         | [] ->
             let toF (_, o) =
@@ -260,6 +265,7 @@ module UnionConvCrate =
                     {
                         Name = name
                         Attributes = attributes
+                        RawCase = case
                     }
                 )
 

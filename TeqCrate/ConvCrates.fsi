@@ -27,7 +27,7 @@ module TupleConvCrate =
 /// a TypeList, and a converter between the first type parameter 'record and a 'ts HList
 /// for any 'ts; the function returns a value of type 'ret.
 type RecordConvEvaluator<'record, 'ret> =
-    abstract member Eval<'ts> : TypeField list -> 'ts TypeList -> Conv<'record, 'ts HList> -> 'ret
+    abstract member Eval<'ts> : RecordTypeField list -> 'ts TypeList -> Conv<'record, 'ts HList> -> 'ret
 
 /// An encoding of an existentially quantified converter between 'record and 'ts HList for some 'ts.
 /// Given a RecordConvEvaluator, it will invoke it with the field names, TypeList and HList that it holds and will return the result.
@@ -49,7 +49,7 @@ module RecordConvCrate =
 /// union cases of the discriminated union, a TypeList, and a converter between
 /// first type parameter 'union and a 'ts HUnion for any 'ts and returns a value of type 'ret
 type UnionConvEvaluator<'union, 'ret> =
-    abstract member Eval : TypeField list -> 'ts TypeList -> Conv<'union, 'ts HUnion> -> 'ret
+    abstract member Eval : UnionTypeField list -> 'ts TypeList -> Conv<'union, 'ts HUnion> -> 'ret
 
 /// An encoding of an existentially quantified converter between 'union and 'ts HUnion for some 'ts.
 /// Given a UnionConvEvaluator, it will invoke it with the case names, TypeList and HUnion that it holds and will return the result.

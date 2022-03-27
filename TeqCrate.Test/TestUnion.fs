@@ -33,7 +33,7 @@ module TestUnion =
 
         let fields =
             { new UnionConvEvaluator<UnionType, _> with
-                member _.Eval (fields : TypeField list) _ _ = fields
+                member _.Eval (fields : UnionTypeField list) _ _ = fields
             }
             |> data.Apply
 
