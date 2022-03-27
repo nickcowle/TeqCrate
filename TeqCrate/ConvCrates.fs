@@ -255,19 +255,7 @@ module UnionConvCrate =
                 cases
                 |> List.map (fun case ->
                     let name = case.Name
-
-                    let attributes =
-                        case.DeclaringType.GetMethod (sprintf "New%s" name)
-                        |> Option.ofObj
-                        |> Option.defaultWith (fun () ->
-                            // nullary constructor
-                            match case.DeclaringType.GetMethod (sprintf "get_%s" name) with
-                            | null ->
-                                // Don't think this can happen?
-                                failwithf "Unable to determine attributes on union case %s" name
-                            | mi -> mi
-                        )
-                        |> fun mi -> mi.CustomAttributes |> Seq.toList
+                    let attributes = case.GetCustomAttributesData () |> List.ofSeq
 
                     {
                         Name = name
