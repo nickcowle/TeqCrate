@@ -1,5 +1,6 @@
 ﻿namespace TeqCrate
 
+open System.Reflection
 open Microsoft.FSharp.Reflection
 open System
 
@@ -33,12 +34,21 @@ module TypePatterns =
         else
             None
 
-    let (|Record|_|) (t : Type) : (string * Type) list option =
+    let (|Record|_|) (t : Type) : (TypeField<PropertyInfo> * Type) list option =
         if FSharpType.IsRecord (t, allowAccessToPrivateRepresentation = true) then
             let pis = FSharpType.GetRecordFields (t, true)
 
             pis
-            |> Seq.map (fun pi -> pi.Name, pi.PropertyType)
+            |> Seq.map (fun pi ->
+                let field =
+                    {
+                        Name = pi.Name
+                        Attributes = pi.CustomAttributes |> Seq.toList
+                        RawCase = pi
+                    }
+
+                field, pi.PropertyType
+            )
             |> List.ofSeq
             |> Some
         else

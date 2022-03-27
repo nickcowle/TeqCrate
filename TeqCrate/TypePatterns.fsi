@@ -19,7 +19,7 @@ module TypePatterns =
     val (|Fun|_|) : Type -> (Type * Type) option
 
     /// Recognises types that represent an F# record type.
-    val (|Record|_|) : Type -> (string * Type) list option
+    val (|Record|_|) : Type -> (RecordTypeField * Type) list option
 
     /// Recognises types that represent an F# discriminated union type.
     val (|Union|_|) : Type -> UnionCaseInfo list option

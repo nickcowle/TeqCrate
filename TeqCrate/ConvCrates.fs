@@ -72,9 +72,8 @@ module TupleConvCrate =
 
         | _ -> None
 
-
 type RecordConvEvaluator<'record, 'ret> =
-    abstract member Eval : string list -> 'ts TypeList -> Conv<'record, 'ts HList> -> 'ret
+    abstract member Eval : RecordTypeField list -> 'ts TypeList -> Conv<'record, 'ts HList> -> 'ret
 
 type 'record RecordConvCrate =
     abstract member Apply : RecordConvEvaluator<'record, 'ret> -> 'ret
@@ -86,27 +85,32 @@ module RecordConvCrate =
             member __.Apply e = e.Eval names tl conv
         }
 
-    let rec makeUntyped<'ts> (names : string list) (tl : 'ts TypeList) (ts : Type list) : obj list RecordConvCrate =
+    let rec makeUntyped<'ts>
+        (fields : RecordTypeField list)
+        (tl : 'ts TypeList)
+        (ts : Type list)
+        : obj list RecordConvCrate
+        =
         match ts with
         | [] ->
             let toF _ = HList.empty
             let fromF _ = []
-            Conv.make toF fromF |> make names TypeList.empty
+            Conv.make toF fromF |> make fields TypeList.empty
         | t :: ts ->
             let crate = TypeParameterCrate.makeUntyped t
 
             crate.Apply
                 { new TypeParameterEvaluator<_> with
-                    member __.Eval<'t> () = makeUntypedInner<'t, 'ts> names tl ts
+                    member __.Eval<'t> () = makeUntypedInner<'t, 'ts> fields tl ts
                 }
 
     and makeUntypedInner<'t, 'ts>
-        (names : string list)
+        (fields : RecordTypeField list)
         (tl : 'ts TypeList)
         (ts : Type list)
         : obj list RecordConvCrate
         =
-        let crate = makeUntyped names tl ts
+        let crate = makeUntyped fields tl ts
 
         crate.Apply
             { new RecordConvEvaluator<_, _> with
@@ -150,7 +154,7 @@ module RecordConvCrate =
 
 
 type UnionConvEvaluator<'union, 'ret> =
-    abstract member Eval : string list -> 'ts TypeList -> Conv<'union, 'ts HUnion> -> 'ret
+    abstract member Eval : UnionTypeField list -> 'ts TypeList -> Conv<'union, 'ts HUnion> -> 'ret
 
 type 'union UnionConvCrate =
     abstract member Apply : UnionConvEvaluator<'union, 'ret> -> 'ret
@@ -162,7 +166,7 @@ module UnionConvCrate =
             member __.Apply e = e.Eval names ts conv
         }
 
-    let rec makeUntyped (names : string list) (ts : Type list) : (int * obj) UnionConvCrate =
+    let rec makeUntyped (names : UnionTypeField list) (ts : Type list) : (int * obj) UnionConvCrate =
         match ts with
         | [] -> failwith "Cannot create UnionConvCrate - the list of union cases must not be empty"
         | t :: ts ->
@@ -174,7 +178,7 @@ module UnionConvCrate =
                 member __.Eval<'t> () = makeUntypedInner<'t> names ts
             }
 
-    and makeUntypedInner<'t> (names : string list) (ts : Type list) : (int * obj) UnionConvCrate =
+    and makeUntypedInner<'t> (names : UnionTypeField list) (ts : Type list) : (int * obj) UnionConvCrate =
         match ts with
         | [] ->
             let toF (_, o) =
@@ -252,13 +256,25 @@ module UnionConvCrate =
                 let fromF (i, o) = o |> convs.[i].From |> unbox
                 Conv.make toF fromF
 
-            let names = cases |> List.map (fun case -> case.Name)
-            let crate = makeUntyped names ts
+            let fields =
+                cases
+                |> List.map (fun case ->
+                    let name = case.Name
+                    let attributes = case.GetCustomAttributesData () |> List.ofSeq
+
+                    {
+                        Name = name
+                        Attributes = attributes
+                        RawCase = case
+                    }
+                )
+
+            let crate = makeUntyped fields ts
 
             crate.Apply
                 { new UnionConvEvaluator<_, _> with
-                    member __.Eval names ts conv =
-                        Conv.compose unionConv conv |> make names ts
+                    member __.Eval fields ts conv =
+                        Conv.compose unionConv conv |> make fields ts
                 }
             |> Some
 

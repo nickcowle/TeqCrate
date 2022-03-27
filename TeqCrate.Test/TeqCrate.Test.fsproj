@@ -11,9 +11,12 @@
   <ItemGroup>
     <Compile Include="TestType.fs" />
     <Compile Include="TestPatterns.fs" />
+    <Compile Include="TestRecord.fs" />
+    <Compile Include="TestUnion.fs" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FsUnit" Version="4.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
