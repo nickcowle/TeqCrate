@@ -4,12 +4,14 @@ open System
 
 /// An encoding of a universally quantified function that takes no parameters
 /// other than the type that it is invoked with.
-type TypeParameterEvaluator<'ret> = abstract member Eval<'a> : unit -> 'ret
+type TypeParameterEvaluator<'ret> =
+    abstract member Eval<'a> : unit -> 'ret
 
 /// An encoding of an existentially quantified type parameter.
 /// Given a TypeParameterEvaluator, it will invoke it with the particular generic type
 /// that it holds and will return the result.
-type TypeParameterCrate = abstract member Apply : TypeParameterEvaluator<'ret> -> 'ret
+type TypeParameterCrate =
+    abstract member Apply : TypeParameterEvaluator<'ret> -> 'ret
 
 /// An encoding of an existentially quantified type parameter.
 /// Given a TypeParameterEvaluator, it will invoke it with the particular generic type

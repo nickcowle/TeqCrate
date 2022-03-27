@@ -11,10 +11,10 @@ type MyRecord =
         Name : string
         DateOfBirth : DateTime
         NewUser : bool
-        Balance: float
+        Balance : float
     }
 
-Path.Combine(__SOURCE_DIRECTORY__, "TestData.csv")
+Path.Combine (__SOURCE_DIRECTORY__, "TestData.csv")
 |> FileInfo
 |> CsvParser.tryParse<MyRecord>
 |> Option.get
