@@ -8,7 +8,7 @@ Type-safe datatype-generic programming for F#
 
 There are pull request checks on this repo, enforcing [Fantomas](https://github.com/fsprojects/fantomas/)-compliant formatting.
 After checking out the repo, you may wish to add a pre-push hook to ensure locally that formatting is complete, rather than having to wait for the CI checks to tell you that you haven't formatted your code.
-Consider performing the following command to set this up in the Amanuensis repo:
+Consider performing the following command to set this up in the repo:
 ```bash
 git config core.hooksPath hooks/
 ```
