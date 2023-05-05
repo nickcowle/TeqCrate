@@ -39,21 +39,7 @@ module TestUnion =
 
         let attributes =
             fields
-            |> List.map (fun field ->
-                // The F# compiler puts in a bunch of attributes on each of these cases; we're not interested in that.
-                let attributes =
-                    field.Attributes
-                    |> List.filter (fun attr ->
-                        [
-                            typeof<Microsoft.FSharp.Core.CompilationMappingAttribute>
-                            typeof<System.SerializableAttribute>
-                            typeof<System.Diagnostics.DebuggerDisplayAttribute>
-                        ]
-                        |> List.forall (fun t -> attr.AttributeType <> t)
-                    )
-
-                field.Name, attributes
-            )
+            |> List.map (fun field -> field.Name, Attribute.filterFromField field)
             |> Map.ofList
 
         attributes.Count |> shouldEqual 4
@@ -74,3 +60,34 @@ module TestUnion =
         |> List.map (fun data -> data.AttributeType)
         |> List.sortBy (fun ty -> ty.Name)
         |> shouldEqual [ typeof<Bar> ; typeof<Foo> ]
+
+    type PrivateFieldUnion =
+        private
+        | Field1
+        | [<Foo>] Field2
+
+    [<Fact>]
+    let ``Can obtain field data for private-implementation unions`` () =
+        let data =
+            match tType<PrivateFieldUnion> with
+            | Union data -> data
+            | _ -> failwith "Unexpected type"
+
+        let fields =
+            { new UnionConvEvaluator<PrivateFieldUnion, _> with
+                member _.Eval (fields : UnionTypeField list) _ _ = fields
+            }
+            |> data.Apply
+
+        let attributes =
+            fields
+            |> List.map (fun field -> field.Name, Attribute.filterFromField field)
+            |> Map.ofList
+
+        attributes.Count |> shouldEqual 2
+        attributes.["Field1"] |> shouldBeEmpty
+
+        attributes.["Field2"]
+        |> List.exactlyOne
+        |> fun data -> data.AttributeType
+        |> shouldEqual typeof<Foo>

@@ -161,6 +161,8 @@ type 'union UnionConvCrate =
 
 module UnionConvCrate =
 
+    let private flags = BindingFlags.Public ||| BindingFlags.NonPublic
+
     let make names ts conv =
         { new UnionConvCrate<_> with
             member __.Apply e = e.Eval names ts conv
@@ -234,8 +236,8 @@ module UnionConvCrate =
                     t, conv
 
             let makeCaseConv case : Conv<obj, obj array> =
-                let reader = FSharpValue.PreComputeUnionReader case
-                let maker = FSharpValue.PreComputeUnionConstructor case
+                let reader = FSharpValue.PreComputeUnionReader (case, flags)
+                let maker = FSharpValue.PreComputeUnionConstructor (case, flags)
                 Conv.make reader maker
 
             let bitsForCase (case : UnionCaseInfo) =
@@ -251,7 +253,7 @@ module UnionConvCrate =
             let convs = convs |> Array.ofList
 
             let unionConv : Conv<'union, int * obj> =
-                let getTag = FSharpValue.PreComputeUnionTagReader t
+                let getTag = FSharpValue.PreComputeUnionTagReader (t, flags)
                 let toF u = let i = getTag u in i, convs.[i].To u
                 let fromF (i, o) = o |> convs.[i].From |> unbox
                 Conv.make toF fromF
@@ -288,6 +290,8 @@ type 'union SumOfProductsConvCrate =
     abstract member Apply : SumOfProductsConvEvaluator<'union, 'ret> -> 'ret
 
 module SumOfProductsConvCrate =
+
+    let private flags = BindingFlags.Public ||| BindingFlags.NonPublic
 
     let make names tss conv =
         { new SumOfProductsConvCrate<_> with
@@ -392,8 +396,8 @@ module SumOfProductsConvCrate =
                         }
 
             let makeCaseConv case : Conv<obj, obj array> =
-                let reader = FSharpValue.PreComputeUnionReader case
-                let maker = FSharpValue.PreComputeUnionConstructor case
+                let reader = FSharpValue.PreComputeUnionReader (case, flags)
+                let maker = FSharpValue.PreComputeUnionConstructor (case, flags)
                 Conv.make reader maker
 
             let bitsForCase (case : UnionCaseInfo) =
@@ -410,7 +414,7 @@ module SumOfProductsConvCrate =
             let convs = convs |> Array.ofList
 
             let unionConv : Conv<'union, int * obj> =
-                let getTag = FSharpValue.PreComputeUnionTagReader t
+                let getTag = FSharpValue.PreComputeUnionTagReader (t, flags)
                 let toF u = let i = getTag u in i, convs.[i].To u
                 let fromF (i, o) = o |> convs.[i].From |> unbox
                 Conv.make toF fromF
