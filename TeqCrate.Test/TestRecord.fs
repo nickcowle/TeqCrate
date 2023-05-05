@@ -46,14 +46,7 @@ module TestRecord =
             fields
             |> List.map (fun field ->
                 // The F# compiler puts in CompilationMappingAttribute on each of these fields; we're not interested in that.
-                let attributes =
-                    field.Attributes
-                    |> List.filter (fun attr ->
-                        attr.AttributeType
-                        <> typeof<Microsoft.FSharp.Core.CompilationMappingAttribute>
-                    )
-
-                field.Name, attributes
+                field.Name, Attribute.filterFromField field
             )
             |> Map.ofList
 
@@ -75,3 +68,38 @@ module TestRecord =
         |> List.map (fun data -> data.AttributeType)
         |> List.sortBy (fun ty -> ty.Name)
         |> shouldEqual [ typeof<Bar> ; typeof<Foo> ]
+
+    type PrivateFieldRecord =
+        private
+            {
+                Field1 : int
+                [<Foo>]
+                Field2 : string
+            }
+
+    [<Fact>]
+    let ``Can obtain field data for private-implementation records`` () =
+        let data =
+            match tType<PrivateFieldRecord> with
+            | Record data -> data
+            | _ -> failwith "Unexpected type"
+
+        let fields =
+            { new RecordConvEvaluator<PrivateFieldRecord, _> with
+                member _.Eval (fields : RecordTypeField list) _ _ = fields
+            }
+            |> data.Apply
+
+        let attributes =
+            fields
+            |> List.map (fun field ->
+                field.Name, Attribute.filterFromField field
+            )
+            |> Map.ofList
+
+        attributes.Count |> shouldEqual 2
+        attributes.["Field1"] |> shouldBeEmpty
+        attributes.["Field2"]
+        |> List.exactlyOne
+        |> fun data -> data.AttributeType
+        |> shouldEqual typeof<Foo>

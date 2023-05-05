@@ -24,18 +24,6 @@ module TestUnion =
         | [<Bar>] Case3
         | [<Foo ; Bar>] Case4 of int64
 
-    let getAttributes field =
-        // The F# compiler puts in a bunch of attributes on each of these cases; we're not interested in that.
-        field.Attributes
-        |> List.filter (fun attr ->
-            [
-                typeof<Microsoft.FSharp.Core.CompilationMappingAttribute>
-                typeof<System.SerializableAttribute>
-                typeof<System.Diagnostics.DebuggerDisplayAttribute>
-            ]
-            |> List.forall (fun t -> attr.AttributeType <> t)
-        )
-
     [<Fact>]
     let ``Custom attributes are populated correctly for union cases`` () =
         let data =
@@ -52,7 +40,7 @@ module TestUnion =
         let attributes =
             fields
             |> List.map (fun field ->
-                field.Name, getAttributes field
+                field.Name, Attribute.filterFromField field
             )
             |> Map.ofList
 
@@ -96,7 +84,7 @@ module TestUnion =
         let attributes =
             fields
             |> List.map (fun field ->
-                field.Name, getAttributes field
+                field.Name, Attribute.filterFromField field
             )
             |> Map.ofList
 

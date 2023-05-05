@@ -55,7 +55,7 @@ module TypePatterns =
             None
 
     let (|Union|_|) (t : Type) : UnionCaseInfo list option =
-        if FSharpType.IsUnion t then
+        if FSharpType.IsUnion (t, BindingFlags.Public ||| BindingFlags.NonPublic) then
             FSharpType.GetUnionCases (t, true)
             |> List.ofArray
             |> Some
