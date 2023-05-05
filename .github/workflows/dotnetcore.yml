@@ -16,14 +16,14 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.x
-    - name: Set up .NET 5.0
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 5.0.x
     - name: Set up .NET 6.0
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 6.0.x
+    - name: Set up .NET 7.0
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 7.0.x
     - name: Install dependencies
       run: dotnet restore
     - name: Build
