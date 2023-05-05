@@ -14,9 +14,11 @@
     <Compile Include="TestPatterns.fs" />
     <Compile Include="TestRecord.fs" />
     <Compile Include="TestUnion.fs" />
+    <Compile Include="TestSurface.fs" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ApiSurface" Version="4.0.8" />
     <PackageReference Include="FsUnit" Version="4.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
