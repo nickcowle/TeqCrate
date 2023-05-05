@@ -92,13 +92,12 @@ module TestRecord =
 
         let attributes =
             fields
-            |> List.map (fun field ->
-                field.Name, Attribute.filterFromField field
-            )
+            |> List.map (fun field -> field.Name, Attribute.filterFromField field)
             |> Map.ofList
 
         attributes.Count |> shouldEqual 2
         attributes.["Field1"] |> shouldBeEmpty
+
         attributes.["Field2"]
         |> List.exactlyOne
         |> fun data -> data.AttributeType

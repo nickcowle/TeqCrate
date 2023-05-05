@@ -16,4 +16,3 @@ module Attribute =
             ]
             |> List.forall (fun t -> attr.AttributeType <> t)
         )
-
