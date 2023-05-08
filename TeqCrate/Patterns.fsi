@@ -9,7 +9,11 @@ module Patterns =
     /// TType (short for 'Typed Type') is a value of a runtime type that is also generic on its value.
     /// We pattern match on typed types (rather than just runtime types) when trying to match against
     /// our TeqCrates so that the type that we're matching against corresponds to the type in the Teq.
-    type 'a TType = TType of unit
+    type 'a TType =
+        /// TType (short for 'Typed Type') is a value of a runtime type that is also generic on its value.
+        /// We pattern match on typed types (rather than just runtime types) when trying to match against
+        /// our TeqCrates so that the type that we're matching against corresponds to the type in the Teq.
+        | TType of unit
 
     /// Single constructor for TType - creates a TType value of 'a when invoked with any generic
     /// type parameter 'a

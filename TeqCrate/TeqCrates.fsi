@@ -7,12 +7,14 @@ open TypeEquality
 /// An encoding of a universally quantified function that takes a type equality between its
 /// first type parameter and a 'b array for any 'b and returns a value of type 'ret
 type ArrayTeqEvaluator<'a, 'ret> =
-    abstract member Eval : Teq<'a, 'b array> -> 'ret
+    /// This is the function that you wish to evaluate when you visit an `ArrayTeqCrate` using this evaluator.
+    abstract Eval : Teq<'a, 'b array> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and a 'b Array for some 'b.
 /// Given an ArrayTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
 type 'a ArrayTeqCrate =
-    abstract member Apply : ArrayTeqEvaluator<'a, 'ret> -> 'ret
+    /// Visit this crate with the given evaluator to reveal the type parameters within the crate.
+    abstract Apply : ArrayTeqEvaluator<'a, 'ret> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and a 'b Array for some 'b.
 /// Given an ArrayTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
@@ -33,12 +35,14 @@ module ArrayTeqCrate =
 /// An encoding of a universally quantified function that takes a type equality between its
 /// first type parameter and a 'b list for any 'b and returns a value of type 'ret
 type ListTeqEvaluator<'a, 'ret> =
-    abstract member Eval : Teq<'a, 'b list> -> 'ret
+    /// This is the function that you wish to evaluate when you visit a `ListTeqCrate` using this evaluator.
+    abstract Eval : Teq<'a, 'b list> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and a 'b list for some 'b.
 /// Given a ListTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
 type 'a ListTeqCrate =
-    abstract member Apply : ListTeqEvaluator<'a, 'ret> -> 'ret
+    /// Visit this crate with the given evaluator to reveal the type parameters within the crate.
+    abstract Apply : ListTeqEvaluator<'a, 'ret> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and a 'b list for some 'b.
 /// Given a ListTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
@@ -59,12 +63,14 @@ module ListTeqCrate =
 /// An encoding of a universally quantified function that takes a type equality between its
 /// first type parameter and a 'b seq for any 'b and returns a value of type 'ret
 type SeqTeqEvaluator<'a, 'ret> =
-    abstract member Eval : Teq<'a, 'b seq> -> 'ret
+    /// This is the function that you wish to evaluate when you visit a `SeqTeqCrate` using this evaluator.
+    abstract Eval : Teq<'a, 'b seq> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and a 'b seq for some 'b.
 /// Given a SeqTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
 type 'a SeqTeqCrate =
-    abstract member Apply : SeqTeqEvaluator<'a, 'ret> -> 'ret
+    /// Visit this crate with the given evaluator to reveal the type parameters within the crate.
+    abstract Apply : SeqTeqEvaluator<'a, 'ret> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and a 'b seq for some 'b.
 /// Given a SeqTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
@@ -85,12 +91,14 @@ module SeqTeqCrate =
 /// An encoding of a universally quantified function that takes a type equality between its
 /// first type parameter and a 'b option for any 'b and returns a value of type 'ret
 type OptionTeqEvaluator<'a, 'ret> =
-    abstract member Eval : Teq<'a, 'b option> -> 'ret
+    /// This is the function that you wish to evaluate when you visit an `OptionTeqCrate` using this evaluator.
+    abstract Eval : Teq<'a, 'b option> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and a 'b option for some 'b.
 /// Given an OptionTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
 type 'a OptionTeqCrate =
-    abstract member Apply : OptionTeqEvaluator<'a, 'ret> -> 'ret
+    /// Visit this crate with the given evaluator to reveal the type parameters within the crate.
+    abstract Apply : OptionTeqEvaluator<'a, 'ret> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and a 'b option for some 'b.
 /// Given an OptionTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
@@ -111,12 +119,14 @@ module OptionTeqCrate =
 /// An encoding of a universally quantified function that takes a type equality between its
 /// first type parameter and a 'b Set for any 'b and returns a value of type 'ret
 type SetTeqEvaluator<'a, 'ret> =
-    abstract member Eval : Teq<'a, 'b Set> -> 'ret
+    /// This is the function that you wish to evaluate when you visit a `SetTeqCrate` using this evaluator.
+    abstract Eval : Teq<'a, 'b Set> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and a 'b Set for some 'b.
 /// Given a SetTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
 type 'a SetTeqCrate =
-    abstract member Apply : SetTeqEvaluator<'a, 'ret> -> 'ret
+    /// Visit this crate with the given evaluator to reveal the type parameters within the crate.
+    abstract Apply : SetTeqEvaluator<'a, 'ret> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and a 'b Set for some 'b.
 /// Given a SetTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
@@ -137,12 +147,14 @@ module SetTeqCrate =
 /// An encoding of a universally quantified function that takes a type equality between its
 /// first type parameter and a Map<'k, 'v> for any 'k, 'v and returns a value of type 'ret
 type MapTeqEvaluator<'a, 'ret> =
-    abstract member Eval : Teq<'a, Map<'k, 'v>> -> 'ret
+    /// This is the function that you wish to evaluate when you visit a `MapTeqCrate` using this evaluator.
+    abstract Eval : Teq<'a, Map<'k, 'v>> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and a Map<'k, 'v> for some 'k, 'v.
 /// Given a MapTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
 type 'a MapTeqCrate =
-    abstract member Apply : MapTeqEvaluator<'a, 'ret> -> 'ret
+    /// Visit this crate with the given evaluator to reveal the type parameters within the crate.
+    abstract Apply : MapTeqEvaluator<'a, 'ret> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and a Map<'k, 'v> for some 'k, 'v.
 /// Given a MapTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
@@ -163,12 +175,14 @@ module MapTeqCrate =
 /// An encoding of a universally quantified function that takes a type equality between its
 /// first type parameter and a Dictionary<'k, 'v> for any 'k, 'v and returns a value of type 'ret
 type DictionaryTeqEvaluator<'a, 'ret> =
-    abstract member Eval : Teq<'a, Dictionary<'k, 'v>> -> 'ret
+    /// This is the function that you wish to evaluate when you visit a `DictionaryTeqCrate` using this evaluator.
+    abstract Eval : Teq<'a, Dictionary<'k, 'v>> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and a Dictionary<'k, 'v> for some 'k, 'v.
 /// Given a DictionaryTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
 type 'a DictionaryTeqCrate =
-    abstract member Apply : DictionaryTeqEvaluator<'a, 'ret> -> 'ret
+    /// Visit this crate with the given evaluator to reveal the type parameters within the crate.
+    abstract Apply : DictionaryTeqEvaluator<'a, 'ret> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and a Dictionary<'k, 'v> for some 'k, 'v.
 /// Given a DictionaryTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
@@ -189,12 +203,14 @@ module DictionaryTeqCrate =
 /// An encoding of a universally quantified function that takes a type equality between its
 /// first type parameter and a 'b ResizeArray for any 'b and returns a value of type 'ret
 type ResizeArrayTeqEvaluator<'a, 'ret> =
-    abstract member Eval : Teq<'a, 'b ResizeArray> -> 'ret
+    /// This is the function that you wish to evaluate when you visit a `ResizeArrayTeqCrate` using this evaluator.
+    abstract Eval : Teq<'a, 'b ResizeArray> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and a 'b ResizeArray for some 'b.
 /// Given a ResizeArrayTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
 type 'a ResizeArrayTeqCrate =
-    abstract member Apply : ResizeArrayTeqEvaluator<'a, 'ret> -> 'ret
+    /// Visit this crate with the given evaluator to reveal the type parameters within the crate.
+    abstract Apply : ResizeArrayTeqEvaluator<'a, 'ret> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and a 'b ResizeArray for some 'b.
 /// Given a ResizeArrayTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
@@ -215,12 +231,14 @@ module ResizeArrayTeqCrate =
 /// An encoding of a universally quantified function that takes a type equality between its
 /// first type parameter and the funtion type ('b -> 'c) for any 'b, 'c and returns a value of type 'ret
 type FunTeqEvaluator<'a, 'ret> =
-    abstract member Eval : Teq<'a, 'b -> 'c> -> 'ret
+    /// This is the function that you wish to evaluate when you visit a `FunTeqCrate` using this evaluator.
+    abstract Eval : Teq<'a, 'b -> 'c> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and the funtion type ('b -> 'c) for some 'b, 'c.
 /// Given a FunTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
 type 'a FunTeqCrate =
-    abstract member Apply : FunTeqEvaluator<'a, 'ret> -> 'ret
+    /// Visit this crate with the given evaluator to reveal the type parameters within the crate.
+    abstract Apply : FunTeqEvaluator<'a, 'ret> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and the funtion type ('b -> 'c) for some 'b, 'c.
 /// Given a FunTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
@@ -241,12 +259,14 @@ module FunTeqCrate =
 /// An encoding of a universally quantified function that takes a type equality between its
 /// first type parameter and the pair type 'b * 'c for any 'b, 'c and returns a value of type 'ret
 type PairTeqEvaluator<'a, 'ret> =
-    abstract member Eval : Teq<'a, 'b * 'c> -> 'ret
+    /// This is the function that you wish to evaluate when you visit a `PairTeqCrate` using this evaluator.
+    abstract Eval : Teq<'a, 'b * 'c> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and the pair type 'b * 'c for some 'b, 'c.
 /// Given a PairTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
 type 'a PairTeqCrate =
-    abstract member Apply : PairTeqEvaluator<'a, 'ret> -> 'ret
+    /// Visit this crate with the given evaluator to reveal the type parameters within the crate.
+    abstract Apply : PairTeqEvaluator<'a, 'ret> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and the pair type 'b * 'c for some 'b, 'c.
 /// Given a PairTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
@@ -267,12 +287,14 @@ module PairTeqCrate =
 /// An encoding of a universally quantified function that takes a type equality between its
 /// first type parameter and the triple type 'b * 'c * 'd for any 'b, 'c, 'd and returns a value of type 'ret
 type TripleTeqEvaluator<'a, 'ret> =
-    abstract member Eval : Teq<'a, 'b * 'c * 'd> -> 'ret
+    /// This is the function that you wish to evaluate when you visit a `TripleTeqCrate` using this evaluator.
+    abstract Eval : Teq<'a, 'b * 'c * 'd> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and the triple type 'b * 'c * 'd for some 'b, 'c, 'd.
 /// Given a TripleTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
 type 'a TripleTeqCrate =
-    abstract member Apply : TripleTeqEvaluator<'a, 'ret> -> 'ret
+    /// Visit this crate with the given evaluator to reveal the type parameters within the crate.
+    abstract Apply : TripleTeqEvaluator<'a, 'ret> -> 'ret
 
 /// An encoding of an existentially quantified type equality between 'a and the triple type 'b * 'c * 'd for some 'b, 'c, 'd.
 /// Given a TripleTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.

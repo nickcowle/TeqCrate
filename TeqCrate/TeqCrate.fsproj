@@ -5,7 +5,6 @@
     <WarningLevel>5</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
-    <Version>0.1.6</Version>
     <Authors>Nicholas Cowle</Authors>
     <Product>TeqCrate</Product>
     <Description>TeqCrate is a type-safe datatype-generic programming library for F#. It offers a type-safe and extensible way to inspect, decompose and create values for various kinds of common F# and .NET types.</Description>
@@ -38,6 +37,8 @@
     <Compile Include="Patterns.fs" />
     <Compile Include="Tuple.fsi" />
     <Compile Include="Tuple.fs" />
+    <EmbeddedResource Include="SurfaceBaseline.txt" />
+    <EmbeddedResource Include="version.json" />
   </ItemGroup>
 
   <ItemGroup>

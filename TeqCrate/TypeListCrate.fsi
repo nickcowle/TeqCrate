@@ -5,13 +5,15 @@ open System
 
 /// A universally quantified function that takes a TypeList and returns a value of type 'ret
 type TypeListEvaluator<'ret> =
-    abstract member Eval : 'ts TypeList -> 'ret
+    /// This is the function that you wish to evaluate when you visit a `TypeListCrate` using this evaluator.
+    abstract Eval : 'ts TypeList -> 'ret
 
 /// An encoding of an existentially quantified TypeList.
 /// Given a TypeListEvaluator, it will invoke it with the TypeList
 /// that it holds and will return the result.
 type TypeListCrate =
-    abstract member Apply : TypeListEvaluator<'ret> -> 'ret
+    /// Visit this crate with the given evaluator to reveal the type parameters within the crate.
+    abstract Apply : TypeListEvaluator<'ret> -> 'ret
 
 /// An encoding of an existentially quantified TypeList.
 /// Given a TypeListEvaluator, it will invoke it with the TypeList
