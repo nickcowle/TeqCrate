@@ -98,3 +98,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "All required checks complete."
+
+  # This check does not gate release, because external dependencies may be flaky.
+  markdown-link-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: gaurav-nelson/github-action-markdown-link-check@v1
+
