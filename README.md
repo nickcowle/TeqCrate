@@ -2,23 +2,12 @@
 
 [![Build Status](https://github.com/nickcowle/TeqCrate/actions/workflows/dotnetcore.yml/badge.svg)](https://github.com/nickcowle/TeqCrate/actions/workflows/dotnetcore.yml)
 
-Type-safe datatype-generic programming for F#
+Type-safe datatype-generic programming for F#.
 
-# Development tips
+## Examples
 
-There are pull request checks on this repo, enforcing [Fantomas](https://github.com/fsprojects/fantomas/)-compliant formatting.
-After checking out the repo, you may wish to add a pre-push hook to ensure locally that formatting is complete, rather than having to wait for the CI checks to tell you that you haven't formatted your code.
-Consider performing the following command to set this up in the repo:
-```bash
-git config core.hooksPath hooks/
-```
-Before your first push (but only once), you will need to install the [.NET local tools](https://docs.microsoft.com/en-us/dotnet/core/tools/local-tools-how-to-use) which form part of the pre-push hook:
-```bash
-dotnet tool restore
-```
+See the [Examples](./Examples) folder for examples demonstrating how to perform type-safe manipulation of various different types.
 
-Some commits (such as big-bang formatting commits) are recorded for convenience in `.git-blame-ignore-revs`.
-Consider performing the following command to have `git blame` ignore these commits:
-```bash
-git config blame.ignoreRevsFile .git-blame-ignore-revs
-```
+## Credits
+
+This library was originally built by [Nicholas Cowle](https://github.com/nickcowle).
