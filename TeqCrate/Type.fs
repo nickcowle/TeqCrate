@@ -15,11 +15,7 @@ module Type =
         | _ when t = typeof<string> -> "string"
         | _ when t = typeof<bool> -> "bool"
         | Fun (domain, range) -> sprintf "(%s -> %s)" (print domain) (print range)
-        | Tuple ts ->
-            ts
-            |> Seq.map print
-            |> String.concat " * "
-            |> sprintf "(%s)"
+        | Tuple ts -> ts |> Seq.map print |> String.concat " * " |> sprintf "(%s)"
         | Array e -> sprintf "%s array" (print e)
         | Generic (t, ts) ->
 

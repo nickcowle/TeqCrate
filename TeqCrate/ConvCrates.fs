@@ -124,8 +124,7 @@ module RecordConvCrate =
                         let os = xs |> HList.tail |> conv.From
                         o :: os
 
-                    Conv.make toF fromF
-                    |> make names (tl |> TypeList.cons)
+                    Conv.make toF fromF |> make names (tl |> TypeList.cons)
             }
 
     let tryMake () : 'record RecordConvCrate option =
@@ -241,10 +240,7 @@ module UnionConvCrate =
                 Conv.make reader maker
 
             let bitsForCase (case : UnionCaseInfo) =
-                let ts =
-                    case.GetFields ()
-                    |> Array.map (fun pi -> pi.PropertyType)
-                    |> List.ofArray
+                let ts = case.GetFields () |> Array.map (fun pi -> pi.PropertyType) |> List.ofArray
 
                 let t, conv = makeConverter ts
                 t, Conv.compose (makeCaseConv case) conv
@@ -317,9 +313,7 @@ module SumOfProductsConvCrate =
         match tss with
         | [] ->
             let toF (_, o) =
-                o
-                |> unbox<'ts HList>
-                |> SumOfProducts.make TypeListList.empty
+                o |> unbox<'ts HList> |> SumOfProducts.make TypeListList.empty
 
             let fromF xs = 0, SumOfProducts.getSingleton xs |> box
             let tl = TypeListList.empty |> TypeListList.cons tl
@@ -378,18 +372,12 @@ module SumOfProductsConvCrate =
                                             let toF os =
                                                 let head = os |> List.head |> unbox<'t>
 
-                                                os
-                                                |> List.tail
-                                                |> conv.To
-                                                |> unbox<'ts HList>
-                                                |> HList.cons head
-                                                |> box
+                                                os |> List.tail |> conv.To |> unbox<'ts HList> |> HList.cons head |> box
 
                                             let fromF o =
                                                 let xs = o |> unbox<('t -> 'ts) HList>
 
-                                                (xs |> HList.head |> box)
-                                                :: (xs |> HList.tail |> box |> conv.From)
+                                                (xs |> HList.head |> box) :: (xs |> HList.tail |> box |> conv.From)
 
                                             crate, Conv.make toF fromF
                                     }
@@ -401,10 +389,7 @@ module SumOfProductsConvCrate =
                 Conv.make reader maker
 
             let bitsForCase (case : UnionCaseInfo) =
-                let ts =
-                    case.GetFields ()
-                    |> Array.map (fun pi -> pi.PropertyType)
-                    |> List.ofArray
+                let ts = case.GetFields () |> Array.map (fun pi -> pi.PropertyType) |> List.ofArray
 
                 let crate, conv = makeConverter ts
                 let conv2 = Conv.make Array.toList List.toArray
