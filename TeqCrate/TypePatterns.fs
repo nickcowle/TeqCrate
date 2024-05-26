@@ -15,16 +15,11 @@ module TypePatterns =
             None
 
     let (|Array|_|) (t : Type) : Type option =
-        if t.IsArray then
-            t.GetElementType () |> Some
-        else
-            None
+        if t.IsArray then t.GetElementType () |> Some else None
 
     let (|Tuple|_|) (t : Type) : Type list option =
         if FSharpType.IsTuple t then
-            FSharpType.GetTupleElements t
-            |> List.ofArray
-            |> Some
+            FSharpType.GetTupleElements t |> List.ofArray |> Some
         else
             None
 
@@ -56,8 +51,6 @@ module TypePatterns =
 
     let (|Union|_|) (t : Type) : UnionCaseInfo list option =
         if FSharpType.IsUnion (t, BindingFlags.Public ||| BindingFlags.NonPublic) then
-            FSharpType.GetUnionCases (t, true)
-            |> List.ofArray
-            |> Some
+            FSharpType.GetUnionCases (t, true) |> List.ofArray |> Some
         else
             None

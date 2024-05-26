@@ -33,8 +33,7 @@ let rec parseRow<'ts> (ts : 'ts TypeList) (cells : string list) : 'ts HList =
                 let head = cells |> List.head |> parseCell<'u>
                 let tail = cells |> List.tail |> parseRow us
 
-                HList.cons head tail
-                |> Teq.castFrom (HList.cong teq)
+                HList.cons head tail |> Teq.castFrom (HList.cong teq)
         }
 
 let tryParse<'record> (fileInfo : FileInfo) : 'record seq option =
@@ -44,12 +43,7 @@ let tryParse<'record> (fileInfo : FileInfo) : 'record seq option =
             { new RecordConvEvaluator<_, _> with
                 member __.Eval _ (ts : 'ts TypeList) (conv : Conv<'record, 'ts HList>) =
                     File.ReadLines fileInfo.FullName
-                    |> Seq.map (fun row ->
-                        row.Split ','
-                        |> List.ofArray
-                        |> parseRow ts
-                        |> conv.From
-                    )
+                    |> Seq.map (fun row -> row.Split ',' |> List.ofArray |> parseRow ts |> conv.From)
                     |> Some
             }
     | _ -> None

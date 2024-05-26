@@ -191,10 +191,7 @@ module TestPatterns =
 
                         let names = names |> List.map TypeField.name
 
-                        record
-                        |> conv.To
-                        |> HList.fold folder (names, Map.empty)
-                        |> snd
+                        record |> conv.To |> HList.fold folder (names, Map.empty) |> snd
                 }
             |> Some
         | _ -> None
@@ -210,8 +207,7 @@ module TestPatterns =
             }
 
         let pairs =
-            tryGetStringKeyValues r
-            |> Option.map (Map.toSeq >> Seq.sort >> List.ofSeq)
+            tryGetStringKeyValues r |> Option.map (Map.toSeq >> Seq.sort >> List.ofSeq)
 
         let expected = Some [ "Baz", "world" ; "Foo", "hello" ]
 
@@ -276,7 +272,13 @@ module TestPatterns =
                             Assert.Equal<string list> (expectedNames, names)
 
                             let expectedUnionType =
-                                tType<(unit -> (int -> string -> bool -> unit) -> (string -> float -> unit) -> (string -> unit) -> unit) SumOfProducts>
+                                tType<
+                                    (unit
+                                        -> (int -> string -> bool -> unit)
+                                        -> (string -> float -> unit)
+                                        -> (string -> unit)
+                                        -> unit) SumOfProducts
+                                 >
 
                             match tType<'a SumOfProducts> with
                             | Teq expectedUnionType teq ->
@@ -314,15 +316,9 @@ module TestPatterns =
             }
 
         let pairs =
-            tryGetStringKeyValues r
-            |> Option.map (Map.toSeq >> Seq.sort >> List.ofSeq)
+            tryGetStringKeyValues r |> Option.map (Map.toSeq >> Seq.sort >> List.ofSeq)
 
-        let expected =
-            Some
-                [
-                    "PrivateBaz", "world"
-                    "PrivateFoo", "hello"
-                ]
+        let expected = Some [ "PrivateBaz", "world" ; "PrivateFoo", "hello" ]
 
         Assert.Equal (expected, pairs)
 
@@ -333,22 +329,13 @@ module TestPatterns =
                     { new RecordConvEvaluator<_, _> with
                         member __.Eval<'a> names ts (conv : Conv<TestPrivateRecord, 'a HList>) =
 
-                            let expectedNames =
-                                [
-                                    "PrivateFoo"
-                                    "PrivateBar"
-                                    "PrivateBaz"
-                                ]
+                            let expectedNames = [ "PrivateFoo" ; "PrivateBar" ; "PrivateBaz" ]
 
                             let actualNames = names |> List.map TypeField.name
 
                             Assert.Equal<string list> (expectedNames, actualNames)
 
-                            TypeList.toTypes ts = [
-                                typeof<string>
-                                typeof<int>
-                                typeof<string>
-                            ]
+                            TypeList.toTypes ts = [ typeof<string> ; typeof<int> ; typeof<string> ]
                     }
             | _ -> false
 
@@ -373,15 +360,10 @@ module TestPatterns =
             }
 
         let pairs =
-            tryGetStringKeyValues r
-            |> Option.map (Map.toSeq >> Seq.sort >> List.ofSeq)
+            tryGetStringKeyValues r |> Option.map (Map.toSeq >> Seq.sort >> List.ofSeq)
 
         let expected =
-            Some
-                [
-                    "InternallyPrivateBaz", "world"
-                    "InternallyPrivateFoo", "hello"
-                ]
+            Some [ "InternallyPrivateBaz", "world" ; "InternallyPrivateFoo", "hello" ]
 
         Assert.Equal (expected, pairs)
 
@@ -393,21 +375,13 @@ module TestPatterns =
                         member __.Eval<'a> names ts (conv : Conv<TestInternallyPrivateRecord, 'a HList>) =
 
                             let expectedNames =
-                                [
-                                    "InternallyPrivateFoo"
-                                    "InternallyPrivateBar"
-                                    "InternallyPrivateBaz"
-                                ]
+                                [ "InternallyPrivateFoo" ; "InternallyPrivateBar" ; "InternallyPrivateBaz" ]
 
                             let actualNames = names |> List.map TypeField.name
 
                             Assert.Equal<string list> (expectedNames, actualNames)
 
-                            TypeList.toTypes ts = [
-                                typeof<string>
-                                typeof<int>
-                                typeof<string>
-                            ]
+                            TypeList.toTypes ts = [ typeof<string> ; typeof<int> ; typeof<string> ]
                     }
             | _ -> false
 

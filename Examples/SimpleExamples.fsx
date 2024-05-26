@@ -58,23 +58,13 @@ let tryListSomeCount (a : 'a) : int option =
                                     let teq : Teq<'a, 'c option list> = Teq.transitivity teq1 (Teq.Cong.list teq2)
                                     let xs : 'c option list = Teq.castTo teq a
 
-                                    xs
-                                    |> List.filter Option.isSome
-                                    |> List.length
-                                    |> Some
+                                    xs |> List.filter Option.isSome |> List.length |> Some
                             }
                     | _ -> None
             }
     | _ -> None
 
-tryListSomeCount
-    [
-        None
-        Some 'a'
-        None
-        Some 'b'
-        Some 'c'
-    ]
+tryListSomeCount [ None ; Some 'a' ; None ; Some 'b' ; Some 'c' ]
 
 
 
@@ -135,15 +125,12 @@ let rec shoutify<'ts> (xs : 'ts HList) : 'ts HList =
 
                 let head =
                     match tType<'u> with
-                    | String teq ->
-                        (xs |> HList.head |> Teq.castTo teq).ToUpper ()
-                        |> Teq.castFrom teq
+                    | String teq -> (xs |> HList.head |> Teq.castTo teq).ToUpper () |> Teq.castFrom teq
                     | _ -> xs |> HList.head
 
                 let tail = xs |> HList.tail |> shoutify
 
-                HList.cons head tail
-                |> Teq.castFrom (HList.cong teq)
+                HList.cons head tail |> Teq.castFrom (HList.cong teq)
         }
 
 let tryShoutifyRecord (a : 'a) : 'a option =

@@ -23,10 +23,7 @@ module ArrayTeqCrate =
 
     let tryMake () =
         match typeof<'a> with
-        | Array e ->
-            make'.Force () [| e |] [||]
-            |> unbox<'a ArrayTeqCrate>
-            |> Some
+        | Array e -> make'.Force () [| e |] [||] |> unbox<'a ArrayTeqCrate> |> Some
         | _ -> None
 
 
@@ -48,10 +45,7 @@ module ListTeqCrate =
 
     let tryMake () =
         match typeof<'a> with
-        | Generic (t, ts) when t = typedefof<_ list> ->
-            make'.Force () ts [||]
-            |> unbox<'a ListTeqCrate>
-            |> Some
+        | Generic (t, ts) when t = typedefof<_ list> -> make'.Force () ts [||] |> unbox<'a ListTeqCrate> |> Some
         | _ -> None
 
 
@@ -73,10 +67,7 @@ module SeqTeqCrate =
 
     let tryMake () =
         match typeof<'a> with
-        | Generic (t, ts) when t = typedefof<_ seq> ->
-            make'.Force () ts [||]
-            |> unbox<'a SeqTeqCrate>
-            |> Some
+        | Generic (t, ts) when t = typedefof<_ seq> -> make'.Force () ts [||] |> unbox<'a SeqTeqCrate> |> Some
         | _ -> None
 
 
@@ -122,10 +113,7 @@ module OptionTeqCrate =
 
     let tryMake () =
         match typeof<'a> with
-        | Generic (t, ts) when t = typedefof<_ option> ->
-            make'.Force () ts [||]
-            |> unbox<'a OptionTeqCrate>
-            |> Some
+        | Generic (t, ts) when t = typedefof<_ option> -> make'.Force () ts [||] |> unbox<'a OptionTeqCrate> |> Some
         | _ -> None
 
 
@@ -147,10 +135,7 @@ module SetTeqCrate =
 
     let tryMake () =
         match typeof<'a> with
-        | Generic (t, ts) when t = typedefof<_ Set> ->
-            make'.Force () ts [||]
-            |> unbox<'a SetTeqCrate>
-            |> Some
+        | Generic (t, ts) when t = typedefof<_ Set> -> make'.Force () ts [||] |> unbox<'a SetTeqCrate> |> Some
         | _ -> None
 
 
@@ -172,10 +157,7 @@ module MapTeqCrate =
 
     let tryMake () =
         match typeof<'a> with
-        | Generic (t, ts) when t = typedefof<Map<_, _>> ->
-            make'.Force () ts [||]
-            |> unbox<'a MapTeqCrate>
-            |> Some
+        | Generic (t, ts) when t = typedefof<Map<_, _>> -> make'.Force () ts [||] |> unbox<'a MapTeqCrate> |> Some
         | _ -> None
 
 
@@ -198,9 +180,7 @@ module DictionaryTeqCrate =
     let tryMake () =
         match typeof<'a> with
         | Generic (t, ts) when t = typedefof<Dictionary<_, _>> ->
-            make'.Force () ts [||]
-            |> unbox<'a DictionaryTeqCrate>
-            |> Some
+            make'.Force () ts [||] |> unbox<'a DictionaryTeqCrate> |> Some
         | _ -> None
 
 
@@ -223,9 +203,7 @@ module ResizeArrayTeqCrate =
     let tryMake () =
         match typeof<'a> with
         | Generic (t, ts) when t = typedefof<_ ResizeArray> ->
-            make'.Force () ts [||]
-            |> unbox<'a ResizeArrayTeqCrate>
-            |> Some
+            make'.Force () ts [||] |> unbox<'a ResizeArrayTeqCrate> |> Some
         | _ -> None
 
 
@@ -247,10 +225,7 @@ module FunTeqCrate =
 
     let tryMake () =
         match typeof<'a> with
-        | Fun (dom, ran) ->
-            make'.Force () [| dom ; ran |] [||]
-            |> unbox<'a FunTeqCrate>
-            |> Some
+        | Fun (dom, ran) -> make'.Force () [| dom ; ran |] [||] |> unbox<'a FunTeqCrate> |> Some
         | _ -> None
 
 
@@ -272,10 +247,7 @@ module PairTeqCrate =
 
     let tryMake () =
         match typeof<'a> with
-        | Tuple ts when ts.Length = 2 ->
-            make'.Force () ts [||]
-            |> unbox<'a PairTeqCrate>
-            |> Some
+        | Tuple ts when ts.Length = 2 -> make'.Force () ts [||] |> unbox<'a PairTeqCrate> |> Some
         | _ -> None
 
 
@@ -297,8 +269,5 @@ module TripleTeqCrate =
 
     let tryMake () =
         match typeof<'a> with
-        | Tuple ts when ts.Length = 3 ->
-            make'.Force () ts [||]
-            |> unbox<'a TripleTeqCrate>
-            |> Some
+        | Tuple ts when ts.Length = 3 -> make'.Force () ts [||] |> unbox<'a TripleTeqCrate> |> Some
         | _ -> None
