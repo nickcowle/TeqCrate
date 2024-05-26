@@ -90,9 +90,7 @@ module Choice2TeqCrate =
     let tryMake () =
         match typeof<'a> with
         | Generic (t, ts) when t = typedefof<Choice<_, _>> ->
-            make'.Force () ts [||]
-            |> unbox<'a Choice2TeqCrate>
-            |> Some
+            make'.Force () ts [||] |> unbox<'a Choice2TeqCrate> |> Some
         | _ -> None
 
 type OptionTeqEvaluator<'a, 'ret> =
