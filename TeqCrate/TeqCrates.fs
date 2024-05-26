@@ -80,8 +80,32 @@ module SeqTeqCrate =
         | _ -> None
 
 
+type Choice2TeqEvaluator<'a, 'ret> =
+    abstract Eval<'b1, 'b2> : Teq<'a, Choice<'b1, 'b2>> -> 'ret
+
+type 'a Choice2TeqCrate =
+    abstract Apply : Choice2TeqEvaluator<'a, 'ret> -> 'ret
+
+[<RequireQualifiedAccess>]
+module Choice2TeqCrate =
+
+    let make () =
+        { new Choice2TeqCrate<_> with
+            member _.Apply e = e.Eval Teq.refl
+        }
+
+    let private make' = lazy (Reflection.invokeStaticMethod <@ make @>)
+
+    let tryMake () =
+        match typeof<'a> with
+        | Generic (t, ts) when t = typedefof<Choice<_, _>> ->
+            make'.Force () ts [||]
+            |> unbox<'a Choice2TeqCrate>
+            |> Some
+        | _ -> None
+
 type OptionTeqEvaluator<'a, 'ret> =
-    abstract member Eval : Teq<'a, 'b option> -> 'ret
+    abstract Eval<'b> : Teq<'a, 'b option> -> 'ret
 
 type 'a OptionTeqCrate =
     abstract member Apply : OptionTeqEvaluator<'a, 'ret> -> 'ret

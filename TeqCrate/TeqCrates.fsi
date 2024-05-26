@@ -92,7 +92,35 @@ module SeqTeqCrate =
 /// first type parameter and a 'b option for any 'b and returns a value of type 'ret
 type OptionTeqEvaluator<'a, 'ret> =
     /// This is the function that you wish to evaluate when you visit an `OptionTeqCrate` using this evaluator.
-    abstract Eval : Teq<'a, 'b option> -> 'ret
+    abstract Eval<'b> : Teq<'a, 'b option> -> 'ret
+
+/// The type of values that act on a ChoiceTeqEvaluator.
+/// An encoding of a universally quantified function that takes a type equality between its
+/// first type parameter and a Choice<'b1, 'b2> for any 'b_i and returns a value of type 'ret
+type Choice2TeqEvaluator<'a, 'ret> =
+    /// This is the function that you wish to evaluate when you visit an `OptionTeqCrate` using this evaluator.
+    abstract Eval<'b1, 'b2> : Teq<'a, Choice<'b1, 'b2>> -> 'ret
+
+/// An encoding of an existentially quantified type equality between 'a and a Choice<'b1, 'b2> for some 'b_i.
+/// Given a Choice2TeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
+type 'a Choice2TeqCrate =
+    /// Visit this crate with the given evaluator to reveal the type parameters within the crate.
+    abstract Apply : Choice2TeqEvaluator<'a, 'ret> -> 'ret
+
+/// An encoding of an existentially quantified type equality between 'a and a Choice<'b1, 'b2> some 'b_i.
+/// Given a Choice2TeqEvaluator, it will invoke it with the type equality that it holds and will return the result.
+[<RequireQualifiedAccess>]
+module Choice2TeqCrate =
+
+    /// For any type 'a, we can create a type equality between Choice<'b1, 'b2> and Choice<'b1, 'b2>, by reflexivity.
+    /// make creates this type equality and then wraps it in a Choice2TeqCrate.
+    val make<'b1, 'b2> : unit -> Choice<'b1, 'b2> Choice2TeqCrate
+
+    /// For any type 'a, checks to see if 'a is actually a Choice<'b1, 'b2> for some 'b_i.
+    /// If it is, creates the type equality eq<'a, Choice<'b1, 'b2>> and then wraps it in a crate.
+    /// Otherwise, returns None.
+    val tryMake : unit -> 'a Choice2TeqCrate option
+
 
 /// An encoding of an existentially quantified type equality between 'a and a 'b option for some 'b.
 /// Given an OptionTeqEvaluator, it will invoke it with the type equality that it holds and will return the result.

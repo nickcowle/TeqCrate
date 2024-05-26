@@ -19,6 +19,38 @@ module TestPatterns =
         | Teq t2 teq -> Assert.True false
         | _ -> Assert.True true
 
+    [<Fact>]
+    let ``Option active pattern recognises an option`` () : unit =
+        let print (x : 'a) : string option =
+            match tType<'a> with
+            | Option crate ->
+                { new OptionTeqEvaluator<_, _> with
+                    member _.Eval<'b> (teq : Teq<'a, 'b option>) =
+                        Teq.castTo teq x |> Option.map (sprintf "%O")
+                }
+                |> crate.Apply
+            | _ -> failwith "should have received an option"
+
+        Assert.Equal (print (Some 3), Some "3")
+        Assert.Equal (print None, None)
+
+    [<Fact>]
+    let ``Choice2 active pattern recognises a choice`` () : unit =
+        let print (x : 'a) : Choice<string, string> =
+            match tType<'a> with
+            | Choice2 crate ->
+                { new Choice2TeqEvaluator<_, _> with
+                    member _.Eval teq =
+                        match Teq.castTo teq x with
+                        | Choice1Of2 c1 -> sprintf "%O" c1 |> Choice1Of2
+                        | Choice2Of2 c2 -> sprintf "%O" c2 |> Choice2Of2
+                }
+                |> crate.Apply
+            | _ -> failwith "should have received a choice2"
+
+        Assert.Equal (print (Choice1Of2 3), Choice1Of2 "3")
+        Assert.Equal (print (Choice2Of2 "hi"), Choice2Of2 "hi")
+
     let tryGetArrayLength (arr : 'a) : int option =
         match tType<'a> with
         | Array c ->
@@ -30,7 +62,6 @@ module TestPatterns =
 
     [<Fact>]
     let ``Array active pattern recognises an array`` () =
-
         let arr = [| "foo" ; "bar" |]
         Assert.Equal (Some 2, tryGetArrayLength arr)
 
