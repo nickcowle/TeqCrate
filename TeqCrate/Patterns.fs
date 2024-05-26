@@ -5,7 +5,7 @@ open TypeEquality
 
 module Patterns =
 
-    type 'a TType = TType of unit
+    type 'a TType = | TType of unit
 
     let tType<'a> : 'a TType = TType ()
 

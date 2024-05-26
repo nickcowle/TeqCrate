@@ -11,12 +11,12 @@ open TeqCrate.Patterns
 module TestRecord =
 
     [<AttributeUsage(AttributeTargets.Property, Inherited = false)>]
-    type Foo() =
-        inherit Attribute()
+    type Foo () =
+        inherit Attribute ()
 
     [<AttributeUsage(AttributeTargets.All, Inherited = false)>]
-    type Bar() =
-        inherit Attribute()
+    type Bar () =
+        inherit Attribute ()
 
     type RecordType =
         {

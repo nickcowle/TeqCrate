@@ -11,12 +11,12 @@ open TeqCrate.Patterns
 module TestUnion =
 
     [<AttributeUsage(AttributeTargets.Property, Inherited = true)>]
-    type Foo() =
-        inherit Attribute()
+    type Foo () =
+        inherit Attribute ()
 
     [<AttributeUsage(AttributeTargets.All, Inherited = false)>]
-    type Bar() =
-        inherit Attribute()
+    type Bar () =
+        inherit Attribute ()
 
     type UnionType =
         | Case1 of string
