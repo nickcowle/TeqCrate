@@ -4,6 +4,8 @@
 
 Type-safe datatype-generic programming for F#.
 
+Note that G-Research [maintains a fork](https://github.com/G-Research/ShapeSifter) of this library.
+
 ## Examples
 
 See the [Examples](./Examples) folder for examples demonstrating how to perform type-safe manipulation of various different types.
